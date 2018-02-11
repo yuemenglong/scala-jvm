@@ -13,28 +13,27 @@ import scala.collection.mutable.ArrayBuffer
   */
 object CpInfo {
   def load(reader: StreamReader, count: Int, cf: ClassFile): Array[CpInfo] = {
-    var ret = new ArrayBuffer[CpInfo]()
+    val ret = new ArrayBuffer[CpInfo]()
     ret += null
     var pos = 1
     while (pos < count) {
       val tag = reader.readByte()
       val info = tag match {
-        case 1 => new ConstantUtf8Info
-        case 3 => new ConstantIntegerInfo
-        case 4 => new ConstantFloatInfo
-        case 5 => new ConstantLongInfo
-        case 6 => new ConstantDoubleInfo
-        case 7 => new ConstantClassInfo
-        case 8 => new ConstantStringInfo
-        case 9 => new ConstantFieldrefInfo
-        case 10 => new ConstantMethodrefInfo
-        case 11 => new ConstantInterfaceMethodrefInfo
-        case 12 => new ConstantNameAndTypeInfo
-        case 15 => new ConstantMethodHandleInfo
-        case 16 => new ConstantMethodTypeInfo
-        case 18 => new ConstantInvokeDynamicInfo
+        case 1 => new ConstantUtf8Info(reader, cf)
+        case 3 => new ConstantIntegerInfo(reader, cf)
+        case 4 => new ConstantFloatInfo(reader, cf)
+        case 5 => new ConstantLongInfo(reader, cf)
+        case 6 => new ConstantDoubleInfo(reader, cf)
+        case 7 => new ConstantClassInfo(reader, cf)
+        case 8 => new ConstantStringInfo(reader, cf)
+        case 9 => new ConstantFieldrefInfo(reader, cf)
+        case 10 => new ConstantMethodrefInfo(reader, cf)
+        case 11 => new ConstantInterfaceMethodrefInfo(reader, cf)
+        case 12 => new ConstantNameAndTypeInfo(reader, cf)
+        case 15 => new ConstantMethodHandleInfo(reader, cf)
+        case 16 => new ConstantMethodTypeInfo(reader, cf)
+        case 18 => new ConstantInvokeDynamicInfo(reader, cf)
       }
-      info.read(reader)
       ret += info
       pos += 1
       if (Array(5, 6).indexOf(tag) >= 0) {
@@ -46,11 +45,11 @@ object CpInfo {
   }
 
   def debug(arr: Array[CpInfo]): Unit = {
-    val str = arr.zipWithIndex.map { case (info, idx) =>
+    val str = arr.map { (info) =>
       if (info == null) {
         "Null"
       } else {
-        s"[${info.ty}] [${info.value(arr)}]"
+        s"[${info.ty}] [${info.value}]"
       }
     }.mkString("\n")
     println(str)
@@ -60,9 +59,7 @@ object CpInfo {
 trait CpInfo {
   val tag: Byte
 
-  def read(reader: StreamReader)
-
-  def value(arr: Array[CpInfo]): Any
+  def value: Any
 
   def ty: String = {
     this match {
@@ -84,174 +81,109 @@ trait CpInfo {
   }
 }
 
-class ConstantUtf8Info extends CpInfo {
+class ConstantUtf8Info(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 1
-  var length: Short = _
-  var bytes: Array[Byte] = _
+  val length: Short = reader.readShort()
+  val bytes: Array[Byte] = reader.readBytes(length)
 
-  override def read(reader: StreamReader): Unit = {
-    length = reader.readShort()
-    bytes = reader.readBytes(length)
-  }
-
-  override def value(arr: Array[CpInfo]): Any = new String(bytes)
+  override def value: Any = new String(bytes)
 }
 
-class ConstantIntegerInfo extends CpInfo {
+class ConstantIntegerInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 3
-  var bytes: Int = _
+  val bytes: Int = reader.readInt()
 
-  override def read(reader: StreamReader): Unit = {
-    bytes = reader.readInt()
-  }
-
-  override def value(arr: Array[CpInfo]) = bytes
+  override def value = bytes
 }
 
-class ConstantFloatInfo extends CpInfo {
+class ConstantFloatInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 4
-  var bytes: Float = _
+  val bytes: Float = reader.readFloat()
 
-  override def read(reader: StreamReader): Unit = {
-    bytes = reader.readFloat()
-  }
-
-  override def value(arr: Array[CpInfo]) = bytes
+  override def value = bytes
 }
 
-class ConstantLongInfo extends CpInfo {
+class ConstantLongInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 5
-  var high_bytes: Int = _
-  var low_bytes: Int = _
+  val high_bytes: Int = reader.readInt()
+  val low_bytes: Int = reader.readInt()
 
-  override def value(arr: Array[CpInfo]): Long = ByteBuffer.allocate(8).putInt(low_bytes).putInt(high_bytes).getLong()
-
-  override def read(reader: StreamReader): Unit = {
-    high_bytes = reader.readInt()
-    low_bytes = reader.readInt()
-  }
+  override def value: Long = ByteBuffer.allocate(8).putInt(low_bytes).putInt(high_bytes).getLong()
 }
 
-class ConstantDoubleInfo extends CpInfo {
+class ConstantDoubleInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 6
-  var high_bytes: Int = _
-  var low_bytes: Int = _
+  val high_bytes: Int = reader.readInt()
+  val low_bytes: Int = reader.readInt()
 
-  override def value(arr: Array[CpInfo]): Double = ByteBuffer.allocate(8).putInt(low_bytes).putInt(high_bytes).getDouble()
-
-  override def read(reader: StreamReader): Unit = {
-    high_bytes = reader.readInt()
-    low_bytes = reader.readInt()
-  }
+  override def value: Double = ByteBuffer.allocate(8).putInt(low_bytes).putInt(high_bytes).getDouble()
 }
 
-class ConstantClassInfo extends CpInfo {
+class ConstantClassInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 7
-  var name_index: Short = _
+  val name_index: Short = reader.readShort()
 
-  override def read(reader: StreamReader): Unit = {
-    name_index = reader.readShort()
-  }
-
-  override def value(arr: Array[CpInfo]) = arr(name_index).value(arr)
+  override def value = cf.constant_pool(name_index).value
 }
 
-class ConstantStringInfo extends CpInfo {
+class ConstantStringInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 8
-  var string_index: Short = _
+  val string_index: Short = reader.readShort()
 
-  override def read(reader: StreamReader): Unit = {
-    string_index = reader.readShort()
-  }
-
-  override def value(arr: Array[CpInfo]) = arr(string_index).value(arr)
+  override def value = cf.constant_pool(string_index).value
 }
 
-class ConstantFieldrefInfo extends CpInfo {
+class ConstantFieldrefInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 9
-  var class_index: Short = _
-  var name_and_type_index: Short = _
+  val class_index: Short = reader.readShort()
+  val name_and_type_index: Short = reader.readShort()
 
-  override def read(reader: StreamReader): Unit = {
-    class_index = reader.readShort()
-    name_and_type_index = reader.readShort()
-  }
-
-  override def value(arr: Array[CpInfo]) = arr(class_index).value(arr) + " | " + arr(name_and_type_index).value(arr)
+  override def value = cf.constant_pool(class_index).value + " | " + cf.constant_pool(name_and_type_index).value
 }
 
-class ConstantMethodrefInfo extends CpInfo {
+class ConstantMethodrefInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 10
-  var class_index: Short = _
-  var name_and_type_index: Short = _
+  val class_index: Short = reader.readShort()
+  val name_and_type_index: Short = reader.readShort()
 
-  override def read(reader: StreamReader): Unit = {
-    class_index = reader.readShort()
-    name_and_type_index = reader.readShort()
-  }
-
-  override def value(arr: Array[CpInfo]) = arr(class_index).value(arr) + " | " + arr(name_and_type_index).value(arr)
+  override def value = cf.constant_pool(class_index).value + " | " + cf.constant_pool(name_and_type_index).value
 }
 
-class ConstantInterfaceMethodrefInfo extends CpInfo {
+class ConstantInterfaceMethodrefInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 11
-  var class_index: Short = _
-  var name_and_type_index: Short = _
+  val class_index: Short = reader.readShort()
+  val name_and_type_index: Short = reader.readShort()
 
-  override def read(reader: StreamReader): Unit = {
-    class_index = reader.readShort()
-    name_and_type_index = reader.readShort()
-  }
-
-  override def value(arr: Array[CpInfo]) = arr(class_index).value(arr) + " | " + arr(name_and_type_index).value(arr)
+  override def value = cf.constant_pool(class_index).value + " | " + cf.constant_pool(name_and_type_index).value
 }
 
-class ConstantNameAndTypeInfo extends CpInfo {
+class ConstantNameAndTypeInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 12
-  var name_index: Short = _
-  var descriptor_index: Short = _
+  val name_index: Short = reader.readShort()
+  val descriptor_index: Short = reader.readShort()
 
-  override def read(reader: StreamReader): Unit = {
-    name_index = reader.readShort()
-    descriptor_index = reader.readShort()
-  }
-
-  override def value(arr: Array[CpInfo]) = arr(name_index).value(arr) + " | " + arr(descriptor_index).value(arr)
+  override def value = cf.constant_pool(name_index).value + " | " + cf.constant_pool(descriptor_index).value
 }
 
-class ConstantMethodHandleInfo extends CpInfo {
+class ConstantMethodHandleInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 15
-  var reference_kind: Byte = _
-  var reference_index: Short = _
+  val reference_kind: Byte = reader.readByte()
+  val reference_index: Short = reader.readShort()
 
-  override def read(reader: StreamReader): Unit = {
-    reference_kind = reader.readByte()
-    reference_index = reader.readShort()
-  }
-
-  override def value(arr: Array[CpInfo]) = reference_kind + " | " + arr(reference_index).value(arr)
+  override def value = reference_kind + " | " + cf.constant_pool(reference_index).value
 }
 
-class ConstantMethodTypeInfo extends CpInfo {
+class ConstantMethodTypeInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 16
-  var descriptor_index: Short = _
+  val descriptor_index: Short = reader.readShort()
 
-  override def read(reader: StreamReader): Unit = {
-    descriptor_index = reader.readShort()
-  }
-
-  override def value(arr: Array[CpInfo]) = arr(descriptor_index).value(arr)
+  override def value = cf.constant_pool(descriptor_index).value
 }
 
-class ConstantInvokeDynamicInfo extends CpInfo {
+class ConstantInvokeDynamicInfo(reader: StreamReader, cf: ClassFile) extends CpInfo {
   override val tag = 18
-  var bootstrap_method_attr_index: Short = _
-  var name_and_type_index: Short = _
+  val bootstrap_method_attr_index: Short = reader.readShort()
+  val name_and_type_index: Short = reader.readShort()
 
-  override def read(reader: StreamReader): Unit = {
-    bootstrap_method_attr_index = reader.readShort()
-    name_and_type_index = reader.readShort()
-  }
-
-  override def value(arr: Array[CpInfo]) = arr(bootstrap_method_attr_index).value(arr) + " | " + arr(name_and_type_index).value(arr)
+  override def value = cf.constant_pool(bootstrap_method_attr_index).value + " | " + cf.constant_pool(name_and_type_index).value
 }

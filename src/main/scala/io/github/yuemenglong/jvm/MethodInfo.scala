@@ -9,7 +9,7 @@ class MethodInfo(reader: StreamReader, cf: ClassFile) {
   val descriptor_index: Short = reader.readShort()
   val attributes_count: Short = reader.readShort()
   val attributes: Array[AttributeInfo] = (1 to attributes_count).map(_ => {
-    new AttributeInfo(reader,cf)
+    new AttributeInfo(reader, cf)
   }).toArray
 }
 
