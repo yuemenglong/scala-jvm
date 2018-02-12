@@ -45,7 +45,12 @@ class ClassFile(reader: StreamReader) extends AccessFlagName {
 
   def thisClassValue: String = constant_pool(this_class).value.toString
 
-  def superClassValue: String = constant_pool(super_class).value.toString
+  def superClassValue: String = {
+    super_class match {
+      case 0 => "NULL"
+      case _ => constant_pool(super_class).value.toString
+    }
+  }
 
   def interfacesValue: Array[String] = interfaces.map(i => {
     constant_pool(i).value.toString

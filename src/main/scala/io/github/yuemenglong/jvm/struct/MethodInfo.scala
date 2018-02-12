@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.struct
 
 import io.github.yuemenglong.json.lang.JsonIgnore
+import io.github.yuemenglong.jvm.attribute.method.{CodeAttribute, SignatureAttribute}
 import io.github.yuemenglong.jvm.common.{AccessFlagName, StreamReader}
 
 /**
@@ -20,9 +21,13 @@ class MethodInfo(reader: StreamReader, cf: ClassFile) extends AccessFlagName {
 
   def descriptorValue: String = cf.constant_pool(descriptor_index).value.toString
 
+  def code: CodeAttribute = attributes.find(_.isInstanceOf[CodeAttribute]).get.asInstanceOf[CodeAttribute]
+
+  def signatures: Array[SignatureAttribute] = attributes.filter(_.isInstanceOf[SignatureAttribute]).map(_.asInstanceOf[SignatureAttribute])
+
   override def toString: String = {
     s"${accessFlagsValue.mkString(",")} ${descriptorValue} ${nameValue}\n" +
-      s"${attributes.map(_.toString).mkString("\n")}\n"
+      s"${attributes.map(_.toString).mkString("\n")}"
   }
 
   override def accessMaskMap = Map(
