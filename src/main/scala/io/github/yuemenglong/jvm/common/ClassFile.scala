@@ -2,14 +2,13 @@ package io.github.yuemenglong.jvm.common
 
 import io.github.yuemenglong.jvm.struct.{AttributeInfo, CpInfo, FieldInfo, MethodInfo}
 
-
 class ClassFile(reader: StreamReader) extends AccessFlagName {
   val magic: Int = reader.readInt()
   require(magic == 0xCAFEBABE)
   val minor_version: Short = reader.readShort()
   val major_version: Short = reader.readShort()
   val constant_pool_count: Short = reader.readShort()
-  val constant_pool: Array[CpInfo] = CpInfo.load(reader, constant_pool_count, this)
+  val constant_pool: Array[CpInfo] = CpInfo.load(reader, this, constant_pool_count)
   val access_flags: Short = reader.readShort()
   val this_class: Short = reader.readShort()
   val super_class: Short = reader.readShort()

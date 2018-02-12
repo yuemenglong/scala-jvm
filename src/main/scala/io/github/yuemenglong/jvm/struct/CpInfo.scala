@@ -11,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
   * Created by <yuemenglong@126.com> on 2018/2/11.
   */
 object CpInfo {
-  def load(reader: StreamReader, count: Int, cf: ClassFile): Array[CpInfo] = {
+  def load(reader: StreamReader, cf: ClassFile, count: Int): Array[CpInfo] = {
     val ret = new ArrayBuffer[CpInfo]()
     ret += null
     var pos = 1

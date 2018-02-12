@@ -4,6 +4,7 @@ import io.github.yuemenglong.jvm.common.{ClassFile, JvmItem, StreamReader}
 import io.github.yuemenglong.jvm.struct.MethodInfo
 
 import scala.collection.mutable.ArrayBuffer
+import io.github.yuemenglong.jvm.common.Types._
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -21,19 +22,19 @@ trait Op extends JvmItem {
   def proc(ctx: RtCtx)
 }
 
-class OpAload(val reader: StreamReader,
-              override val cf: ClassFile,
-              override val method: MethodInfo,
-              val opCode: Byte) extends Op {
-  require(n >= 0 && n <= 3)
-
-  private def n = opCode - 0x2A
-
-  private def idx = n + 1
-
-  override val opName = s"aload_${n}"
-
-  override def proc(ctx: RtCtx): Unit = {
-
+object Op {
+  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, length: Int): Array[Op] = {
+    val rest = reader.length - length
+    val ret = new ArrayBuffer[Op]()
+    while (reader.length > rest) {
+      val code = reader.readByte()
+      val op = code match {
+        case c if 0xAC <= c && c <= 0xB1 => OpReturn.load(reader, cf, method, code)
+      }
+      ret += op
+    }
+    ret.toArray
   }
 }
+
+
