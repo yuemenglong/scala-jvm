@@ -48,7 +48,7 @@ class OpLoad[T: ClassTag](reader: StreamReader,
       case Types.classOfDouble => "d"
       case Types.classOfRef => "a"
     }
-    s"${prefix}load(${index})"
+    s"${prefix}load ${index}"
   }
 
   override def proc(ctx: RtCtx): Unit = ???
