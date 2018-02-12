@@ -2,14 +2,12 @@ package io.github.yuemenglong.jvm
 
 import java.nio.ByteBuffer
 
+import io.github.yuemenglong.json.lang.JsonIgnore
+
 import scala.collection.mutable.ArrayBuffer
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/11.
-  */
-
-/**
-  * Created by <yuemenglong@126.com> on 2018/2/8.
   */
 object CpInfo {
   def load(reader: StreamReader, count: Int, cf: ClassFile): Array[CpInfo] = {
@@ -56,6 +54,7 @@ object CpInfo {
   }
 }
 
+@JsonIgnore(Array("reader", "cf"))
 trait CpInfo {
   val tag: Byte
 

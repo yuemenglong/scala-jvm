@@ -1,10 +1,11 @@
 package io.github.yuemenglong.jvm
 
-/**
-  * Created by <yuemenglong@126.com> on 2018/2/11.
-  */
-class ClassFile(reader: StreamReader) {
+import scala.collection.mutable.ArrayBuffer
+
+
+class ClassFile(reader: StreamReader) extends AccessFlagName {
   val magic: Int = reader.readInt()
+  require(magic == 0xCAFEBABE)
   val minor_version: Short = reader.readShort()
   val major_version: Short = reader.readShort()
   val constant_pool_count: Short = reader.readShort()
@@ -26,6 +27,39 @@ class ClassFile(reader: StreamReader) {
   }).toArray
   val attribute_count: Short = reader.readShort()
   val attributes: Array[AttributeInfo] = (1 to attribute_count).map(_ => {
-    new AttributeInfo(reader, this)
+    AttributeInfo.load(reader, this)
   }).toArray
+
+  override def toString: String = {
+    Array(
+      accessFlagsValue.mkString(", "),
+      thisClassValue,
+      superClassValue,
+      "[INTERFACE]",
+      interfacesValue.mkString(", "),
+      "[METHOD]",
+      methods.map(_.toString).mkString("\n"),
+      "[ATTRIBUTE]",
+      attributes.map(_.toString).mkString("\n"),
+    ).mkString("\n")
+  }
+
+  def thisClassValue: String = constant_pool(this_class).value.toString
+
+  def superClassValue: String = constant_pool(super_class).value.toString
+
+  def interfacesValue: Array[String] = interfaces.map(i => {
+    constant_pool(i).value.toString
+  })
+
+  override def accessMaskMap = Map(
+    0x0001 -> "ACC_PUBLIC",
+    0x0010 -> "ACC_FINAL",
+    0x0020 -> "ACC_SUPER",
+    0x0200 -> "ACC_INTERFACE",
+    0x0400 -> "ACC_ABSTRACT",
+    0x1000 -> "ACC_SYNTHETIC",
+    0x2000 -> "ACC_ANNOTATION",
+    0x4000 -> "ACC_ENUM",
+  )
 }

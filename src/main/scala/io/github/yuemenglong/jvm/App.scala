@@ -3,6 +3,8 @@ package io.github.yuemenglong.jvm
 import java.io.FileInputStream
 
 import io.github.yuemenglong.json.JSON
+import io.github.yuemenglong.json.kit.Kit
+import io.github.yuemenglong.json.lang.JsonIgnore
 
 import scala.tools.nsc.interpreter.InputStream
 
@@ -22,16 +24,14 @@ object App {
 
   def main(args: Array[String]): Unit = {
     val fs = new FileInputStream("target/classes/io/github/yuemenglong/jvm/Java.class")
-  val stream = read(fs)
-  val reader = new StreamReader(stream)
-  println(stream.length)
-  //    val a = stream.drop(stream.length - 1)
-  val cf = new ClassFile(reader)
-
-  println(JSON.pretty(cf))
-  //    header.constant_pool.filter(_ != null).filter(_.tag == 1).foreach(println)
-  CpInfo.debug(cf.constant_pool)
-}
+    val stream = read(fs)
+    val reader = new StreamReader(stream)
+    println(stream.length)
+    //    val a = stream.drop(stream.length - 1)
+    val cf = new ClassFile(reader)
+    println(cf)
+    println(JSON.pretty(cf.methods(0).attributes(0)))
+  }
 }
 
 

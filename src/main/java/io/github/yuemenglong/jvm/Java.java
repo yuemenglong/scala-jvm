@@ -4,4 +4,11 @@
 package io.github.yuemenglong.jvm;
 
 public class Java {
+    void foo() {
+
+    }
+
+    void bar() {
+
+    }
 }
