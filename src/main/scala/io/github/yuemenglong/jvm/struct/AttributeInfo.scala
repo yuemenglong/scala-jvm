@@ -1,6 +1,6 @@
-package io.github.yuemenglong.jvm.item
+package io.github.yuemenglong.jvm.struct
 
-import io.github.yuemenglong.jvm.attribute.CodeAttribute
+import io.github.yuemenglong.jvm.attribute.{CodeAttribute, LocalVariableTableAttribute}
 import io.github.yuemenglong.jvm.common.{ClassFile, JvmItem, StreamReader}
 
 
@@ -11,6 +11,7 @@ object AttributeInfo {
     val name = s"${cf.constant_pool(attribute_name_index).value}"
     name match {
       case "Code" => new CodeAttribute(reader, cf, attribute_name_index, attribute_length)
+      case "LocalVariableTable" => new LocalVariableTableAttribute(reader, cf, attribute_name_index, attribute_length)
       case _ => new OtherAttribute(reader, cf, attribute_name_index, attribute_length)
     }
   }

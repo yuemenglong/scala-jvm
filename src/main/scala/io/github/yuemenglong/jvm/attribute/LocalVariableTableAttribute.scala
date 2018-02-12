@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.attribute
 
-import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader}
-import io.github.yuemenglong.jvm.item.AttributeInfo
+import io.github.yuemenglong.jvm.common.{ClassFile, JvmItem, StreamReader}
+import io.github.yuemenglong.jvm.struct.AttributeInfo
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -11,9 +11,31 @@ class LocalVariableTableAttribute(reader: StreamReader,
                                   override val attribute_name_index: Short,
                                   override val attribute_length: Int
                                  ) extends AttributeInfo {
+  val local_variable_table_length: Short = reader.readShort()
+  val local_variable_table: Array[LocalVariableTable] = (1 to local_variable_table_length).map(_ => {
+    new LocalVariableTable(reader, cf)
+  }).toArray
 
+  override def toString = {
+    s"${name} ${local_variable_table_length}\n" +
+      local_variable_table.map(_.toString).mkString("\n")
+  }
 }
 
-class LocalVariableTable{
-  val start_pc
+class LocalVariableTable(reader: StreamReader,
+                         override val cf: ClassFile
+                        ) extends JvmItem {
+  val start_pc: Short = reader.readShort()
+  val length: Short = reader.readShort()
+  val name_index: Short = reader.readShort()
+  val descriptor_index: Short = reader.readShort()
+  val index: Short = reader.readShort()
+
+  def name = cf.constant_pool(name_index).toString
+
+  def descriptor = cf.constant_pool(descriptor_index).toString
+
+  override def toString = {
+    s"${descriptor} ${name} ${index}"
+  }
 }

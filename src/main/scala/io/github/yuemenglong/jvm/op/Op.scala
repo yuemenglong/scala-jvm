@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{ClassFile, JvmItem, StreamReader}
-import io.github.yuemenglong.jvm.item.MethodInfo
+import io.github.yuemenglong.jvm.struct.MethodInfo
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -25,11 +25,13 @@ class OpAload(val reader: StreamReader,
               override val cf: ClassFile,
               override val method: MethodInfo,
               val opCode: Byte) extends Op {
-  require(idx >= 0 && idx <= 3)
+  require(n >= 0 && n <= 3)
 
-  private def idx = opCode - 0x2A
+  private def n = opCode - 0x2A
 
-  override val opName = s"aload_${idx}"
+  private def idx = n + 1
+
+  override val opName = s"aload_${n}"
 
   override def proc(ctx: RtCtx): Unit = {
 

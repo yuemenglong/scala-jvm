@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.attribute
 
 import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader}
-import io.github.yuemenglong.jvm.item.AttributeInfo
+import io.github.yuemenglong.jvm.struct.AttributeInfo
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.

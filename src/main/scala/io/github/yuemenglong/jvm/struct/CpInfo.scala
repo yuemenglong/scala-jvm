@@ -1,4 +1,4 @@
-package io.github.yuemenglong.jvm.item
+package io.github.yuemenglong.jvm.struct
 
 import java.nio.ByteBuffer
 
@@ -78,6 +78,8 @@ trait CpInfo extends JvmItem {
       case _: ConstantInvokeDynamicInfo => "InvokeDynamic"
     }
   }
+
+  override def toString: String = s"[${ty}]${value}"
 }
 
 class ConstantUtf8Info(reader: StreamReader, override val cf: ClassFile) extends CpInfo {

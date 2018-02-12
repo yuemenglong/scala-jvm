@@ -1,4 +1,4 @@
-package io.github.yuemenglong.jvm.item
+package io.github.yuemenglong.jvm.struct
 
 import io.github.yuemenglong.json.lang.JsonIgnore
 import io.github.yuemenglong.jvm.common.{AccessFlagName, ClassFile, StreamReader}

@@ -1,6 +1,6 @@
 package io.github.yuemenglong.jvm.common
 
-import io.github.yuemenglong.jvm.item.{AttributeInfo, CpInfo, FieldInfo, MethodInfo}
+import io.github.yuemenglong.jvm.struct.{AttributeInfo, CpInfo, FieldInfo, MethodInfo}
 
 
 class ClassFile(reader: StreamReader) extends AccessFlagName {
