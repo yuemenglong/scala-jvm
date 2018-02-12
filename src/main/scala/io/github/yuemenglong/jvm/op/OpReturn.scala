@@ -1,13 +1,15 @@
 package io.github.yuemenglong.jvm.op
 
-import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader}
+import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader, Types}
 import io.github.yuemenglong.jvm.struct.MethodInfo
+
+import scala.reflect.{ClassTag, classTag}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
 object OpReturn {
-  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, code: Byte): OpReturn[_] = {
+  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, code: Int): OpReturn[_] = {
     code match {
       case 0xAC => new OpReturn[Int](reader, cf, method, code)
       case 0xAD => new OpReturn[Long](reader, cf, method, code)
@@ -19,30 +21,22 @@ object OpReturn {
   }
 }
 
-class OpReturn[T](val reader: StreamReader,
-                  override val cf: ClassFile,
-                  override val method: MethodInfo,
-                  val opCode: Byte,
-                 ) extends Op {
-  require(n >= 0 && n <= 3)
-
-  private def n = opCode - 0x2A
-
-  private def idx = n + 1
-
+class OpReturn[T: ClassTag](val reader: StreamReader,
+                            override val cf: ClassFile,
+                            override val method: MethodInfo,
+                            val opCode: Int,
+                           ) extends Op {
   override val opName = {
-    val s = opCode match {
-      case 0xAC => "i"
-      case 0xAD => "l"
-      case 0xAE => "f"
-      case 0xAF => "d"
-      case 0xD0 => "a"
-      case 0xD1 => ""
+    val s = classTag[T].runtimeClass match {
+      case Types.classOfInt => "i"
+      case Types.classOfLong => "l"
+      case Types.classOfFloat => "f"
+      case Types.classOfDouble => "d"
+      case Types.classOfRef => "a"
+      case Types.classOfVoid => ""
     }
     s"${s}return"
   }
 
-  override def proc(ctx: RtCtx): Unit = {
-
-  }
+  override def proc(ctx: RtCtx): Unit = ???
 }

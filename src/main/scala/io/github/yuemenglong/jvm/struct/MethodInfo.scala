@@ -13,7 +13,7 @@ class MethodInfo(reader: StreamReader, cf: ClassFile) extends AccessFlagName {
   val descriptor_index: Short = reader.readShort()
   val attributes_count: Short = reader.readShort()
   val attributes: Array[AttributeInfo] = (1 to attributes_count).map(_ => {
-    AttributeInfo.load(reader, cf)
+    AttributeInfo.load(reader, cf, method = this)
   }).toArray
 
   def nameValue: String = cf.constant_pool(name_index).value.toString
@@ -22,7 +22,7 @@ class MethodInfo(reader: StreamReader, cf: ClassFile) extends AccessFlagName {
 
   override def toString: String = {
     s"${accessFlagsValue.mkString(",")} ${descriptorValue} ${nameValue}\n" +
-      s"${attributes.map(_.toString).mkString("\n")}"
+      s"${attributes.map(_.toString).mkString("\n")}\n"
   }
 
   override def accessMaskMap = Map(
