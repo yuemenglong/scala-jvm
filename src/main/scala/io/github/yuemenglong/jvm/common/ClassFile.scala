@@ -1,6 +1,6 @@
-package io.github.yuemenglong.jvm
+package io.github.yuemenglong.jvm.common
 
-import scala.collection.mutable.ArrayBuffer
+import io.github.yuemenglong.jvm.item.{AttributeInfo, CpInfo, FieldInfo, MethodInfo}
 
 
 class ClassFile(reader: StreamReader) extends AccessFlagName {

@@ -5,6 +5,7 @@ import java.io.FileInputStream
 import io.github.yuemenglong.json.JSON
 import io.github.yuemenglong.json.kit.Kit
 import io.github.yuemenglong.json.lang.JsonIgnore
+import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader}
 
 import scala.tools.nsc.interpreter.InputStream
 

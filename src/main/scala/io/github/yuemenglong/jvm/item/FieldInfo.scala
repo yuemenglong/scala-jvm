@@ -1,6 +1,7 @@
-package io.github.yuemenglong.jvm
+package io.github.yuemenglong.jvm.item
 
 import io.github.yuemenglong.json.lang.JsonIgnore
+import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/11.
