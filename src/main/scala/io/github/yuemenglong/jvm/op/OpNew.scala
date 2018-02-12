@@ -9,11 +9,11 @@ import scala.reflect.{ClassTag, classTag}
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
 object OpNew {
-  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, code: Int): Op = {
+  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
-      case 0xBB => new OpNew(reader, cf, method, code)
-      case 0xBC => new OpNewArray(reader, cf, method, code)
-      case 0xBD => new OpANewArray(reader, cf, method, code)
+      case 0xBB => new OpNew(reader, cf, method, lineNo, code)
+      case 0xBC => new OpNewArray(reader, cf, method, lineNo, code)
+      case 0xBD => new OpANewArray(reader, cf, method, lineNo, code)
     }
   }
 }
@@ -21,6 +21,7 @@ object OpNew {
 class OpNew(val reader: StreamReader,
             override val cf: ClassFile,
             override val method: MethodInfo,
+            val lineNo: Int,
             val opCode: Int,
            ) extends Op {
   val index: Short = reader.readShort()
@@ -34,6 +35,7 @@ class OpNew(val reader: StreamReader,
 class OpNewArray(val reader: StreamReader,
                  override val cf: ClassFile,
                  override val method: MethodInfo,
+                 val lineNo: Int,
                  val opCode: Int,
                 ) extends Op {
   val atype: Short = reader.readByte()
@@ -61,6 +63,7 @@ class OpNewArray(val reader: StreamReader,
 class OpANewArray(val reader: StreamReader,
                   override val cf: ClassFile,
                   override val method: MethodInfo,
+                  val lineNo: Int,
                   val opCode: Int,
                  ) extends Op {
   val index: Short = reader.readShort()

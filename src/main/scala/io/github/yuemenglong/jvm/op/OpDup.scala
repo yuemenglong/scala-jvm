@@ -9,11 +9,11 @@ import scala.reflect.{ClassTag, classTag}
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
 object OpDup {
-  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, code: Int): Op = {
+  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
-      case c if 0x59 <= c && c <= 0x5B => new OpDup(reader, cf, method, code)
-      case c if 0x5C <= c && c <= 0x5E => new OpDup2(reader, cf, method, code)
-      case 0x5F => new OpSwap(reader, cf, method, code)
+      case c if 0x59 <= c && c <= 0x5B => new OpDup(reader, cf, method, lineNo, code)
+      case c if 0x5C <= c && c <= 0x5E => new OpDup2(reader, cf, method, lineNo, code)
+      case 0x5F => new OpSwap(reader, cf, method, lineNo, code)
     }
   }
 }
@@ -21,6 +21,7 @@ object OpDup {
 class OpDup(val reader: StreamReader,
             override val cf: ClassFile,
             override val method: MethodInfo,
+            val lineNo: Int,
             val opCode: Int,
            ) extends Op {
   val offset: Int = opCode - 0x59
@@ -39,6 +40,7 @@ class OpDup(val reader: StreamReader,
 class OpDup2(val reader: StreamReader,
              override val cf: ClassFile,
              override val method: MethodInfo,
+             val lineNo: Int,
              val opCode: Int,
             ) extends Op {
   val offset: Int = opCode - 0x5C
@@ -58,6 +60,7 @@ class OpDup2(val reader: StreamReader,
 class OpSwap(val reader: StreamReader,
              override val cf: ClassFile,
              override val method: MethodInfo,
+             val lineNo: Int,
              val opCode: Int,
             ) extends Op {
   val offset: Int = opCode - 0x5C

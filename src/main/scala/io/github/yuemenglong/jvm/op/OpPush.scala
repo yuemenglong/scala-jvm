@@ -9,10 +9,10 @@ import scala.reflect.{ClassTag, classTag}
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
 object OpPush {
-  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, code: Int): Op = {
+  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
-      case c if 0x01 <= c && c <= 0x0F => new OpConst(reader, cf, method, code)
-      case c if 0x10 <= c && c <= 0x14 => new OpPush(reader, cf, method, code)
+      case c if 0x01 <= c && c <= 0x0F => new OpConst(reader, cf, method, lineNo, code)
+      case c if 0x10 <= c && c <= 0x14 => new OpPush(reader, cf, method, lineNo, code)
     }
   }
 }
@@ -20,6 +20,7 @@ object OpPush {
 class OpConst(reader: StreamReader,
               override val cf: ClassFile,
               override val method: MethodInfo,
+              val lineNo: Int,
               val opCode: Int,
              ) extends Op {
   val value = opCode match {
@@ -57,6 +58,7 @@ class OpConst(reader: StreamReader,
 class OpPush(reader: StreamReader,
              override val cf: ClassFile,
              override val method: MethodInfo,
+             val lineNo: Int,
              val opCode: Int,
             ) extends Op {
   val value = opCode match {

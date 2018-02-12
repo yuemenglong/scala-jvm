@@ -9,14 +9,14 @@ import scala.reflect.{ClassTag, classTag}
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
 object OpReturn {
-  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, code: Int): Op = {
+  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
-      case 0xAC => new OpReturn[Int](reader, cf, method, code)
-      case 0xAD => new OpReturn[Long](reader, cf, method, code)
-      case 0xAE => new OpReturn[Float](reader, cf, method, code)
-      case 0xAF => new OpReturn[Double](reader, cf, method, code)
-      case 0xB0 => new OpReturn[AnyRef](reader, cf, method, code)
-      case 0xB1 => new OpReturn[Unit](reader, cf, method, code)
+      case 0xAC => new OpReturn[Int](reader, cf, method, lineNo, code)
+      case 0xAD => new OpReturn[Long](reader, cf, method, lineNo, code)
+      case 0xAE => new OpReturn[Float](reader, cf, method, lineNo, code)
+      case 0xAF => new OpReturn[Double](reader, cf, method, lineNo, code)
+      case 0xB0 => new OpReturn[AnyRef](reader, cf, method, lineNo, code)
+      case 0xB1 => new OpReturn[Unit](reader, cf, method, lineNo, code)
     }
   }
 }
@@ -24,6 +24,7 @@ object OpReturn {
 class OpReturn[T: ClassTag](val reader: StreamReader,
                             override val cf: ClassFile,
                             override val method: MethodInfo,
+                            val lineNo: Int,
                             val opCode: Int,
                            ) extends Op {
   override val opName = {

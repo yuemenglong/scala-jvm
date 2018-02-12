@@ -26,7 +26,7 @@ object App {
 
   def main(args: Array[String]): Unit = {
     //    val fs = new FileInputStream("target/classes/io/github/yuemenglong/jvm/Java.class")
-    val fs = Thread.currentThread().getContextClassLoader.getResourceAsStream("Object.bin")
+    val fs = Thread.currentThread().getContextClassLoader.getResourceAsStream("Object.class")
     val stream = read(fs)
     val reader = new StreamReader(stream)
     println(stream.length)

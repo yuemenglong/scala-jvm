@@ -9,11 +9,12 @@ import scala.reflect.{ClassTag, classTag}
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
 object OpCmp {
-  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, code: Int): Op = {
+  def load(reader: StreamReader, cf: ClassFile,
+           method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
-      case c if 0x99 <= c && c <= 0x9E => new OpCmp0(reader, cf, method, code)
-      case c if 0x9F <= c && c <= 0xA4 => new OpCmpI(reader, cf, method, code)
-      case c if 0xA5 <= c && c <= 0xA6 => new OpCmpA(reader, cf, method, code)
+      case c if 0x99 <= c && c <= 0x9E => new OpCmp0(reader, cf, method, lineNo, code)
+      case c if 0x9F <= c && c <= 0xA4 => new OpCmpI(reader, cf, method, lineNo, code)
+      case c if 0xA5 <= c && c <= 0xA6 => new OpCmpA(reader, cf, method, lineNo, code)
     }
   }
 }
@@ -21,6 +22,7 @@ object OpCmp {
 class OpCmp0(val reader: StreamReader,
              override val cf: ClassFile,
              override val method: MethodInfo,
+             val lineNo: Int,
              val opCode: Int,
             ) extends Op {
   val offset: Short = reader.readShort()
@@ -51,6 +53,7 @@ class OpCmp0(val reader: StreamReader,
 class OpCmpI(val reader: StreamReader,
              override val cf: ClassFile,
              override val method: MethodInfo,
+             val lineNo: Int,
              val opCode: Int,
             ) extends Op {
   val offset: Short = reader.readShort()
@@ -81,6 +84,7 @@ class OpCmpI(val reader: StreamReader,
 class OpCmpA(val reader: StreamReader,
              override val cf: ClassFile,
              override val method: MethodInfo,
+             val lineNo: Int,
              val opCode: Int,
             ) extends Op {
   val offset: Short = reader.readShort()

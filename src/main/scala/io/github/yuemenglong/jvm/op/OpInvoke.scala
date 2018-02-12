@@ -7,13 +7,13 @@ import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
 object OpInvoke {
-  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, code: Int): Op = {
+  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
-      case 0xB6 => new OpInvokeVirtual(reader, cf, method, code)
-      case 0xB7 => new OpInvokeSpecial(reader, cf, method, code)
-      case 0xB8 => new OpInvokeStatic(reader, cf, method, code)
-      case 0xB9 => new OpInvokeInterface(reader, cf, method, code)
-      case 0xBA => new OpInvokeDynamic(reader, cf, method, code)
+      case 0xB6 => new OpInvokeVirtual(reader, cf, method, lineNo, code)
+      case 0xB7 => new OpInvokeSpecial(reader, cf, method, lineNo, code)
+      case 0xB8 => new OpInvokeStatic(reader, cf, method, lineNo, code)
+      case 0xB9 => new OpInvokeInterface(reader, cf, method, lineNo, code)
+      case 0xBA => new OpInvokeDynamic(reader, cf, method, lineNo, code)
     }
   }
 }
@@ -21,6 +21,7 @@ object OpInvoke {
 class OpInvokeDynamic(val reader: StreamReader,
                       override val cf: ClassFile,
                       override val method: MethodInfo,
+                      val lineNo: Int,
                       val opCode: Int,
                      ) extends Op {
   val index: Short = reader.readShort()
@@ -37,6 +38,7 @@ class OpInvokeDynamic(val reader: StreamReader,
 class OpInvokeInterface(val reader: StreamReader,
                         override val cf: ClassFile,
                         override val method: MethodInfo,
+                        val lineNo: Int,
                         val opCode: Int,
                        ) extends Op {
   val index: Short = reader.readShort()
@@ -54,6 +56,7 @@ class OpInvokeInterface(val reader: StreamReader,
 class OpInvokeSpecial(val reader: StreamReader,
                       override val cf: ClassFile,
                       override val method: MethodInfo,
+                      val lineNo: Int,
                       val opCode: Int,
                      ) extends Op {
   val index: Short = reader.readShort()
@@ -67,6 +70,7 @@ class OpInvokeSpecial(val reader: StreamReader,
 class OpInvokeStatic(val reader: StreamReader,
                      override val cf: ClassFile,
                      override val method: MethodInfo,
+                     val lineNo: Int,
                      val opCode: Int,
                     ) extends Op {
   val index: Short = reader.readShort()
@@ -80,6 +84,7 @@ class OpInvokeStatic(val reader: StreamReader,
 class OpInvokeVirtual(val reader: StreamReader,
                       override val cf: ClassFile,
                       override val method: MethodInfo,
+                      val lineNo: Int,
                       val opCode: Int,
                      ) extends Op {
   val index: Short = reader.readShort()
