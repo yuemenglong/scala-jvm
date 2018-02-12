@@ -1,8 +1,7 @@
 package io.github.yuemenglong.jvm.struct
 
-import io.github.yuemenglong.jvm.attribute.{CodeAttribute, LocalVariableTableAttribute}
+import io.github.yuemenglong.jvm.attribute.{CodeAttribute, LineNumberTableAttribute, LocalVariableTableAttribute}
 import io.github.yuemenglong.jvm.common.{ClassFile, JvmItem, StreamReader}
-
 
 object AttributeInfo {
   def load(reader: StreamReader, cf: ClassFile): AttributeInfo = {
@@ -12,6 +11,7 @@ object AttributeInfo {
     name match {
       case "Code" => new CodeAttribute(reader, cf, attribute_name_index, attribute_length)
       case "LocalVariableTable" => new LocalVariableTableAttribute(reader, cf, attribute_name_index, attribute_length)
+      case "LineNumberTable" => new LineNumberTableAttribute(reader, cf, attribute_name_index, attribute_length)
       case _ => new OtherAttribute(reader, cf, attribute_name_index, attribute_length)
     }
   }

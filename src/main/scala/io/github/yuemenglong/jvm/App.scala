@@ -31,7 +31,8 @@ object App {
     //    val a = stream.drop(stream.length - 1)
     val cf = new ClassFile(reader)
     println(cf)
-    println(JSON.pretty(cf.methods(0).attributes(0)))
+    println()
+    println(JSON.pretty(cf.methods(1).attributes(0)))
   }
 }
 
