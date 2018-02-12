@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.attribute.method
 
 import io.github.yuemenglong.jvm.common.{JvmItem, StreamReader}
-import io.github.yuemenglong.jvm.struct.{ClassFile, MethodAttributeInfo, MethodInfo}
+import io.github.yuemenglong.jvm.struct.{ClassFile, MethodAttributeChild, MethodInfo}
 import jdk.internal.org.objectweb.asm.tree.MethodInsnNode
 
 /**
@@ -12,7 +12,7 @@ class LineNumberTableAttribute(reader: StreamReader,
                                override val method: MethodInfo,
                                override val attribute_name_index: Short,
                                override val attribute_length: Int
-                              ) extends MethodAttributeInfo {
+                              ) extends MethodAttributeChild {
   val line_number_table_length: Short = reader.readShort()
   val line_number_table: Array[LineNumberTable] = (1 to line_number_table_length).map(_ => {
     new LineNumberTable(reader, cf)

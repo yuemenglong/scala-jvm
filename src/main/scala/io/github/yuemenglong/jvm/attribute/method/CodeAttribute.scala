@@ -2,7 +2,7 @@ package io.github.yuemenglong.jvm.attribute.method
 
 import io.github.yuemenglong.jvm.common.StreamReader
 import io.github.yuemenglong.jvm.op.Op
-import io.github.yuemenglong.jvm.struct.{AttributeInfo, ClassFile, MethodAttributeInfo, MethodInfo}
+import io.github.yuemenglong.jvm.struct.{AttributeInfo, ClassFile, MethodAttributeChild, MethodInfo}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -12,7 +12,7 @@ class CodeAttribute(reader: StreamReader,
                     override val method: MethodInfo,
                     override val attribute_name_index: Short,
                     override val attribute_length: Int
-                   ) extends MethodAttributeInfo {
+                   ) extends MethodAttributeChild {
   require(method != null)
   val max_stack: Short = reader.readShort()
   val max_locals: Short = reader.readShort()

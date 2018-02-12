@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.attribute.method
 
 import io.github.yuemenglong.jvm.common.StreamReader
-import io.github.yuemenglong.jvm.struct.{AttributeInfo, ClassFile, MethodAttributeInfo, MethodInfo}
+import io.github.yuemenglong.jvm.struct.{AttributeInfo, ClassFile, MethodAttributeChild, MethodInfo}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -11,7 +11,7 @@ class SignatureAttribute(reader: StreamReader,
                          override val method: MethodInfo,
                          override val attribute_name_index: Short,
                          override val attribute_length: Int
-                        ) extends MethodAttributeInfo {
+                        ) extends MethodAttributeChild {
   val signature_index: Short = reader.readShort()
 
   override def toString = {

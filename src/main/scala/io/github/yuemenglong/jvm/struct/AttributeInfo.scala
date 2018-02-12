@@ -24,10 +24,10 @@ trait AttributeInfo extends JvmItem {
 
   def name: String = s"${cf.constant_pool(attribute_name_index).value}"
 
-  override def toString = name
+  override def toString = name + "???"
 }
 
-trait MethodAttributeInfo extends AttributeInfo {
+trait MethodAttributeChild extends AttributeInfo {
   val method: MethodInfo
 }
 

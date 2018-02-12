@@ -2,7 +2,6 @@ package io.github.yuemenglong.jvm.struct
 
 import java.nio.ByteBuffer
 
-import io.github.yuemenglong.jvm._
 import io.github.yuemenglong.jvm.common.{JvmItem, StreamReader}
 
 import scala.collection.mutable.ArrayBuffer
@@ -48,7 +47,7 @@ object CpInfo {
       if (info == null) {
         "Null"
       } else {
-        s"[${info.ty}] [${info.value}]"
+        s"[${info.name}] [${info.value}]"
       }
     }.mkString("\n")
     println(str)
@@ -60,7 +59,7 @@ trait CpInfo extends JvmItem {
 
   def value: Any
 
-  def ty: String = {
+  def name: String = {
     this match {
       case _: ConstantUtf8Info => "Utf8"
       case _: ConstantIntegerInfo => "Integer"
@@ -79,7 +78,7 @@ trait CpInfo extends JvmItem {
     }
   }
 
-  override def toString: String = s"[${ty}]${value}"
+  override def toString: String = s"[${name}]${value}"
 }
 
 class ConstantUtf8Info(reader: StreamReader, override val cf: ClassFile) extends CpInfo {

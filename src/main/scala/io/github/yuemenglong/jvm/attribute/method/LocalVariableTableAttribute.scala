@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.attribute.method
 
 import io.github.yuemenglong.jvm.common.{JvmItem, StreamReader}
-import io.github.yuemenglong.jvm.struct.{ClassFile, MethodAttributeInfo, MethodInfo}
+import io.github.yuemenglong.jvm.struct.{ClassFile, MethodAttributeChild, MethodInfo}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -11,7 +11,7 @@ class LocalVariableTableAttribute(reader: StreamReader,
                                   override val method: MethodInfo,
                                   override val attribute_name_index: Short,
                                   override val attribute_length: Int
-                                 ) extends MethodAttributeInfo {
+                                 ) extends MethodAttributeChild {
   val local_variable_table_length: Short = reader.readShort()
   val local_variable_table: Array[LocalVariableTable] = (1 to local_variable_table_length).map(_ => {
     new LocalVariableTable(reader, cf)

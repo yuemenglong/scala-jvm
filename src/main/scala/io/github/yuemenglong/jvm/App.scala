@@ -6,7 +6,7 @@ import io.github.yuemenglong.json.JSON
 import io.github.yuemenglong.json.kit.Kit
 import io.github.yuemenglong.json.lang.JsonIgnore
 import io.github.yuemenglong.jvm.common.StreamReader
-import io.github.yuemenglong.jvm.struct.ClassFile
+import io.github.yuemenglong.jvm.struct.{ClassFile, CpInfo}
 
 import scala.tools.nsc.interpreter.InputStream
 
@@ -32,8 +32,9 @@ object App {
     println(stream.length)
     //    val a = stream.drop(stream.length - 1)
     val cf = new ClassFile(reader)
+    CpInfo.debug(cf.constant_pool)
+    println("===================================================================")
     println(cf)
-    println()
     //    println(JSON.pretty(cf.methods(1).attributes(0)))
   }
 }
