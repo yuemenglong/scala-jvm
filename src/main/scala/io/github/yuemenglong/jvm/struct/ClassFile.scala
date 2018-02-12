@@ -1,6 +1,6 @@
-package io.github.yuemenglong.jvm.common
+package io.github.yuemenglong.jvm.struct
 
-import io.github.yuemenglong.jvm.struct.{AttributeInfo, CpInfo, FieldInfo, MethodInfo}
+import io.github.yuemenglong.jvm.common.{AccessFlagName, StreamReader}
 
 class ClassFile(reader: StreamReader) extends AccessFlagName {
   val magic: Int = reader.readInt()

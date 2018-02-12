@@ -1,8 +1,8 @@
 package io.github.yuemenglong.jvm.attribute
 
-import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader}
+import io.github.yuemenglong.jvm.common.StreamReader
 import io.github.yuemenglong.jvm.op.Op
-import io.github.yuemenglong.jvm.struct.{AttributeInfo, MethodInfo}
+import io.github.yuemenglong.jvm.struct.{AttributeInfo, ClassFile, MethodInfo}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.

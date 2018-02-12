@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
-import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader, Types}
-import io.github.yuemenglong.jvm.struct.MethodInfo
+import io.github.yuemenglong.jvm.common.{StreamReader, Types}
+import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.reflect.{ClassTag, classTag}
 

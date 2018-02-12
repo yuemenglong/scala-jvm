@@ -3,7 +3,7 @@ package io.github.yuemenglong.jvm.struct
 import java.nio.ByteBuffer
 
 import io.github.yuemenglong.jvm._
-import io.github.yuemenglong.jvm.common.{ClassFile, JvmItem, StreamReader}
+import io.github.yuemenglong.jvm.common.{JvmItem, StreamReader}
 
 import scala.collection.mutable.ArrayBuffer
 

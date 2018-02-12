@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
-import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader, Types}
-import io.github.yuemenglong.jvm.struct.MethodInfo
+import io.github.yuemenglong.jvm.common.{StreamReader, Types}
+import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.reflect.{ClassTag, classTag}
 
@@ -9,7 +9,7 @@ import scala.reflect.{ClassTag, classTag}
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
 object OpReturn {
-  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, code: Int): OpReturn[_] = {
+  def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, code: Int): Op = {
     code match {
       case 0xAC => new OpReturn[Int](reader, cf, method, code)
       case 0xAD => new OpReturn[Long](reader, cf, method, code)

@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
-import io.github.yuemenglong.jvm.common.{ClassFile, JvmItem, StreamReader}
-import io.github.yuemenglong.jvm.struct.MethodInfo
+import io.github.yuemenglong.jvm.common.{JvmItem, StreamReader}
+import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.collection.mutable.ArrayBuffer
 import io.github.yuemenglong.jvm.common.Types._
@@ -34,6 +34,7 @@ object Op {
       val op = code match {
         case c if 0x15 <= c && c <= 0x2D => OpLoad.load(reader, cf, method, code)
         case c if 0xAC <= c && c <= 0xB1 => OpReturn.load(reader, cf, method, code)
+        case c if 0xB6 <= c && c <= 0xBA => OpInvoke.load(reader, cf, method, code)
         case _ => new OpOther(reader, cf, method, code, reader.readBytes(reader.length.toInt - rest.toInt))
       }
       ret += op

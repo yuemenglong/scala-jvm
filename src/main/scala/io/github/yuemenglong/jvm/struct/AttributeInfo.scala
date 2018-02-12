@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.struct
 
 import io.github.yuemenglong.jvm.attribute.{CodeAttribute, LineNumberTableAttribute, LocalVariableTableAttribute}
-import io.github.yuemenglong.jvm.common.{ClassFile, JvmItem, StreamReader}
+import io.github.yuemenglong.jvm.common.{JvmItem, StreamReader}
 
 object AttributeInfo {
   def load(reader: StreamReader, cf: ClassFile, method: MethodInfo = null): AttributeInfo = {

@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.struct
 
 import io.github.yuemenglong.json.lang.JsonIgnore
-import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader}
+import io.github.yuemenglong.jvm.common.StreamReader
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/11.

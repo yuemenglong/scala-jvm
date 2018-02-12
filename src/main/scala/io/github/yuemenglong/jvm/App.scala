@@ -5,7 +5,8 @@ import java.io.FileInputStream
 import io.github.yuemenglong.json.JSON
 import io.github.yuemenglong.json.kit.Kit
 import io.github.yuemenglong.json.lang.JsonIgnore
-import io.github.yuemenglong.jvm.common.{ClassFile, StreamReader}
+import io.github.yuemenglong.jvm.common.StreamReader
+import io.github.yuemenglong.jvm.struct.ClassFile
 
 import scala.tools.nsc.interpreter.InputStream
 
@@ -32,7 +33,7 @@ object App {
     val cf = new ClassFile(reader)
     println(cf)
     println()
-    println(JSON.pretty(cf.methods(1).attributes(0)))
+    //    println(JSON.pretty(cf.methods(1).attributes(0)))
   }
 }
 
