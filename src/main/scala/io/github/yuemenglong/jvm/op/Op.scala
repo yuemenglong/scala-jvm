@@ -22,6 +22,8 @@ trait Op extends JvmItem {
 
   def proc(ctx: RtCtx)
 
+  def cp(idx: Int): String = cf.constant_pool(idx).toString
+
   override def toString = opName
 }
 
@@ -35,6 +37,7 @@ object Op {
         case c if 0x15 <= c && c <= 0x2D => OpLoad.load(reader, cf, method, code)
         case c if 0xAC <= c && c <= 0xB1 => OpReturn.load(reader, cf, method, code)
         case c if 0xB6 <= c && c <= 0xBA => OpInvoke.load(reader, cf, method, code)
+        case c if 0xBB <= c && c <= 0xBD => OpNew.load(reader, cf, method, code)
         case _ => new OpOther(reader, cf, method, code, reader.readBytes(reader.length.toInt - rest.toInt))
       }
       ret += op
