@@ -7,7 +7,6 @@ import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 import scala.collection.mutable.ArrayBuffer
 
 
-
 trait Op extends JvmItem {
   val method: MethodInfo
   val opCode: Int
@@ -31,6 +30,7 @@ object Op {
         case c if 0x01 <= c && c <= 0x14 => OpPush.load(reader, cf, method, lineNo, code)
         case c if 0x15 <= c && c <= 0x2D => OpLoad.load(reader, cf, method, lineNo, code)
         case c if 0x36 <= c && c <= 0x4E => OpStore.load(reader, cf, method, lineNo, code)
+        case c if 0x57 <= c && c <= 0x58 => OpPop.load(reader, cf, method, lineNo, code)
         case c if 0x59 <= c && c <= 0x5F => OpDup.load(reader, cf, method, lineNo, code)
         case c if 0x60 <= c && c <= 0x84 => OpMath.load(reader, cf, method, lineNo, code)
         case c if 0x94 <= c && c <= 0xA6 => OpCmp.load(reader, cf, method, lineNo, code)

@@ -21,6 +21,7 @@ class RuntimeCtx {
 }
 
 class ThreadCtx(val method: MethodInfo, val rt: RuntimeCtx) {
+
   var frames: ArrayBuffer[Frame] = new ArrayBuffer[Frame]()
   var stack: ArrayBuffer[Any] = new ArrayBuffer[Any]()
   frames += new Frame(method)
@@ -44,6 +45,10 @@ class ThreadCtx(val method: MethodInfo, val rt: RuntimeCtx) {
   def call(method: MethodInfo, params: Map[Int, Any]): Unit = {
     val frame = new Frame(method, params)
     frames += frame
+  }
+
+  def ret() = {
+    frames -= frame
   }
 
   def inc(): Unit = {

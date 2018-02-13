@@ -12,33 +12,30 @@ import scala.reflect.{ClassTag, classTag}
 object OpReturn {
   def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
-      case 0xAC => new OpReturn[Int](reader, cf, method, lineNo, code)
-      case 0xAD => new OpReturn[Long](reader, cf, method, lineNo, code)
-      case 0xAE => new OpReturn[Float](reader, cf, method, lineNo, code)
-      case 0xAF => new OpReturn[Double](reader, cf, method, lineNo, code)
-      case 0xB0 => new OpReturn[AnyRef](reader, cf, method, lineNo, code)
-      case 0xB1 => new OpReturn[Unit](reader, cf, method, lineNo, code)
+      case c if 0xAC <= c && c <= 0xB1 => new OpReturn(reader, cf, method, lineNo, code)
     }
   }
 }
 
-class OpReturn[T: ClassTag](val reader: StreamReader,
-                            override val cf: ClassFile,
-                            override val method: MethodInfo,
-                            val lineNo: Int,
-                            val opCode: Int,
-                           ) extends Op {
+class OpReturn(val reader: StreamReader,
+               override val cf: ClassFile,
+               override val method: MethodInfo,
+               val lineNo: Int,
+               val opCode: Int,
+              ) extends Op {
+  val prefix = opCode match {
+    case 0xAC => "i"
+    case 0xAD => "l"
+    case 0xAE => "f"
+    case 0xAF => "d"
+    case 0xB0 => "a"
+    case 0xB1 => ""
+  }
   override val opName = {
-    val s = classTag[T].runtimeClass match {
-      case Types.classOfInt => "i"
-      case Types.classOfLong => "l"
-      case Types.classOfFloat => "f"
-      case Types.classOfDouble => "d"
-      case Types.classOfRef => "a"
-      case Types.classOfVoid => ""
-    }
-    s"${s}return"
+    s"${prefix}return"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    ctx.ret()
+  }
 }

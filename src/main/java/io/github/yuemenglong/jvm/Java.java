@@ -7,7 +7,7 @@ public class Java {
     public static void main(String args[]) {
         double a = 1;
         double b = 2;
-        sub(a, b);
+        double c = sub(a, b);
     }
 
     public static double sub(double a, double b) {
