@@ -31,15 +31,12 @@ class ClassFile(reader: StreamReader) extends AccessFlagName {
 
   override def toString: String = {
     Array(
-      accessFlagsValue.mkString(", "),
-      thisClassValue,
-      superClassValue,
-      "[INTERFACE]",
-      interfacesValue.mkString(", "),
-      "[METHOD]",
-      methods.map(_.toString).mkString("\n"),
+      s"${accessFlagsValue.mkString(",")} [${thisClassValue}] Extends [${superClassValue}]",
+      s"[Interface] ${interfacesValue.mkString(",")}",
+      methods.mkString("\n"),
+      fields.mkString("\n"),
       "[ATTRIBUTE]",
-      attributes.map(_.toString).mkString("\n"),
+      attributes.mkString("\n"),
     ).mkString("\n")
   }
 

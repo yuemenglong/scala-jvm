@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{StreamReader, Types}
+import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.reflect.{ClassTag, classTag}
@@ -37,7 +38,7 @@ class OpMath(val reader: StreamReader,
     s"${prefix}${fn}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 class OpMath2(val reader: StreamReader,
@@ -60,5 +61,5 @@ class OpMath2(val reader: StreamReader,
     s"${prefix}${fn}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }

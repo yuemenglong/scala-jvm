@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{StreamReader, Types}
+import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.reflect.{ClassTag, classTag}
@@ -39,5 +40,5 @@ class OpReturn[T: ClassTag](val reader: StreamReader,
     s"${s}return"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }

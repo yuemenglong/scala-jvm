@@ -1,17 +1,12 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{JvmItem, StreamReader}
+import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.collection.mutable.ArrayBuffer
 
-/**
-  * Created by <yuemenglong@126.com> on 2018/2/12.
-  */
 
-class RtCtx {
-  var stack = new ArrayBuffer[Any]
-}
 
 trait Op extends JvmItem {
   val method: MethodInfo
@@ -20,9 +15,7 @@ trait Op extends JvmItem {
 
   val opName: String
 
-  def proc(ctx: RtCtx)
-
-  def cp(idx: Int): String = cf.constant_pool(idx).toString
+  def proc(ctx: ThreadCtx)
 
   override def toString = opName
 }
@@ -64,5 +57,5 @@ class OpOther(reader: StreamReader,
              ) extends Op {
   override val opName = (Array(opCode.toByte) ++ bytes).map(b => f"${b}%02X").mkString("-")
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }

@@ -4,11 +4,9 @@
 package io.github.yuemenglong.jvm;
 
 public class Java {
-    void foo() {
-
-    }
-
-    void bar() {
-
+    public static void main(String args[]) {
+        int a = 1;
+        int b = 2;
+        int c = a + b;
     }
 }

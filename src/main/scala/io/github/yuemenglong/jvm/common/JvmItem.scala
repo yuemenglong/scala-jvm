@@ -9,4 +9,6 @@ import io.github.yuemenglong.jvm.struct.ClassFile
 @JsonIgnore(Array("reader", "cf", "method"))
 trait JvmItem {
   val cf: ClassFile
+
+  def cp(idx: Int): String = cf.constant_pool(idx).toString
 }

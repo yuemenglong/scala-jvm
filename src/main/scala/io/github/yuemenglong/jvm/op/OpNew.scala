@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{StreamReader, Types}
+import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.reflect.{ClassTag, classTag}
@@ -29,7 +30,7 @@ class OpNew(val reader: StreamReader,
     s"new ${cp(index)}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 class OpNewArray(val reader: StreamReader,
@@ -57,7 +58,7 @@ class OpNewArray(val reader: StreamReader,
     s"newarray ${ty}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 class OpANewArray(val reader: StreamReader,
@@ -72,5 +73,5 @@ class OpANewArray(val reader: StreamReader,
     s"anewarray ${cp(index)}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }

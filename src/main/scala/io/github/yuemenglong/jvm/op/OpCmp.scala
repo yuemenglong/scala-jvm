@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{StreamReader, Types}
+import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.reflect.{ClassTag, classTag}
@@ -34,7 +35,7 @@ class OpCmp(val reader: StreamReader,
     case 0x98 => "dcmpg"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 class OpCmp0(val reader: StreamReader,
@@ -65,7 +66,7 @@ class OpCmp0(val reader: StreamReader,
     s"if${postfix} ${offset}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 class OpCmpI(val reader: StreamReader,
@@ -95,7 +96,7 @@ class OpCmpI(val reader: StreamReader,
     s"if_icmp${postfix} ${offset}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 
@@ -119,5 +120,5 @@ class OpCmpA(val reader: StreamReader,
     s"if_acmp${postfix} ${offset}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }

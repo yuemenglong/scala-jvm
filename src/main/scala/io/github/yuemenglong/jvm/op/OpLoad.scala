@@ -1,9 +1,8 @@
 package io.github.yuemenglong.jvm.op
 
-import io.github.yuemenglong.jvm.common.{StreamReader, Types}
+import io.github.yuemenglong.jvm.common.StreamReader
+import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
-
-import scala.reflect.{ClassTag, classTag}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -35,5 +34,5 @@ class OpLoad(reader: StreamReader,
     s"${prefix}load ${index}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }

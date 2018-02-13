@@ -26,7 +26,7 @@ class MethodInfo(reader: StreamReader, cf: ClassFile) extends AccessFlagName {
   def signatures: Array[SignatureAttribute] = attributes.filter(_.isInstanceOf[SignatureAttribute]).map(_.asInstanceOf[SignatureAttribute])
 
   override def toString: String = {
-    s"${accessFlagsValue.mkString(",")} ${descriptorValue} ${nameValue}\n" +
+    s"[Method] ${accessFlagsValue.mkString(",")} ${descriptorValue} ${nameValue} ${signatures.map(_.toString).mkString(",")}\n" +
       s"${attributes.map(_.toString).mkString("\n")}"
   }
 

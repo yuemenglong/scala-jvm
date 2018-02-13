@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.StreamReader
+import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 /**
@@ -32,7 +33,7 @@ class OpInvokeDynamic(val reader: StreamReader,
     s"invokedynamic ${cf.constant_pool(index)}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 class OpInvokeInterface(val reader: StreamReader,
@@ -50,7 +51,7 @@ class OpInvokeInterface(val reader: StreamReader,
     s"invokeinterface ${cf.constant_pool(index)}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 class OpInvokeSpecial(val reader: StreamReader,
@@ -64,7 +65,7 @@ class OpInvokeSpecial(val reader: StreamReader,
     s"invokespecial ${cf.constant_pool(index)}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 class OpInvokeStatic(val reader: StreamReader,
@@ -78,7 +79,7 @@ class OpInvokeStatic(val reader: StreamReader,
     s"invokestatic ${cf.constant_pool(index)}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 class OpInvokeVirtual(val reader: StreamReader,
@@ -92,5 +93,5 @@ class OpInvokeVirtual(val reader: StreamReader,
     s"invokevirtual ${cf.constant_pool(index)}"
   }
 
-  override def proc(ctx: RtCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ???
 }
