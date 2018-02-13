@@ -43,11 +43,11 @@ object CpInfo {
   }
 
   def debug(arr: Array[CpInfo]): Unit = {
-    val str = arr.map { (info) =>
+    val str = arr.zipWithIndex.map { case (info, i) =>
       if (info == null) {
-        "Null"
+        f"[${i}%02d] Null"
       } else {
-        s"[${info.name}] [${info.value}]"
+        f"[${i}%02d] [${info.name}] [${info.value}]"
       }
     }.mkString("\n")
     println(str)

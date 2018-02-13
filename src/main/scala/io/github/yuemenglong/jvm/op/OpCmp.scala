@@ -12,11 +12,29 @@ object OpCmp {
   def load(reader: StreamReader, cf: ClassFile,
            method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
+      case c if 0x94 <= c && c <= 0x98 => new OpCmp(reader, cf, method, lineNo, code)
       case c if 0x99 <= c && c <= 0x9E => new OpCmp0(reader, cf, method, lineNo, code)
       case c if 0x9F <= c && c <= 0xA4 => new OpCmpI(reader, cf, method, lineNo, code)
       case c if 0xA5 <= c && c <= 0xA6 => new OpCmpA(reader, cf, method, lineNo, code)
     }
   }
+}
+
+class OpCmp(val reader: StreamReader,
+            override val cf: ClassFile,
+            override val method: MethodInfo,
+            val lineNo: Int,
+            val opCode: Int,
+           ) extends Op {
+  override val opName = opCode match {
+    case 0x94 => "lcmp"
+    case 0x95 => "fcmpl"
+    case 0x96 => "fcmpg"
+    case 0x97 => "dcmpl"
+    case 0x98 => "dcmpg"
+  }
+
+  override def proc(ctx: RtCtx): Unit = ???
 }
 
 class OpCmp0(val reader: StreamReader,
