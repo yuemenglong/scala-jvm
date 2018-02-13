@@ -25,20 +25,69 @@ class OpMath(val reader: StreamReader,
              val lineNo: Int,
              val opCode: Int,
             ) extends Op {
-  override val opName = {
-    val fn = opCode match {
-      case c if 0x60 <= c && c <= 0x63 => "add"
-      case c if 0x64 <= c && c <= 0x67 => "sub"
-      case c if 0x68 <= c && c <= 0x6B => "mul"
-      case c if 0x6C <= c && c <= 0x6F => "div"
-      case c if 0x70 <= c && c <= 0x73 => "rem"
-      case c if 0x74 <= c && c <= 0x77 => "neg"
-    }
-    val prefix = "ilfd".charAt(opCode % 4)
-    s"${prefix}${fn}"
+
+  val prefix = "ilfd".charAt(opCode % 4)
+
+  val op = opCode match {
+    case c if 0x60 <= c && c <= 0x63 => "add"
+    case c if 0x64 <= c && c <= 0x67 => "sub"
+    case c if 0x68 <= c && c <= 0x6B => "mul"
+    case c if 0x6C <= c && c <= 0x6F => "div"
+    case c if 0x70 <= c && c <= 0x73 => "rem"
+    case c if 0x74 <= c && c <= 0x77 => "neg"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override val opName = {
+    s"${prefix}${op}"
+  }
+
+  override def proc(ctx: ThreadCtx): Unit = {
+    val top = ctx.pop()
+    val res = op match {
+      case "add" => prefix match {
+        case 'i' => ctx.pop().asInstanceOf[Int] + top.asInstanceOf[Int]
+        case 'l' => ctx.pop().asInstanceOf[Long] + top.asInstanceOf[Long]
+        case 'f' => ctx.pop().asInstanceOf[Float] + top.asInstanceOf[Float]
+        case 'd' => ctx.pop().asInstanceOf[Double] + top.asInstanceOf[Double]
+      }
+      case "sub" => prefix match {
+        case 'i' => ctx.pop().asInstanceOf[Int] - top.asInstanceOf[Int]
+        case 'l' => ctx.pop().asInstanceOf[Long] - top.asInstanceOf[Long]
+        case 'f' => ctx.pop().asInstanceOf[Float] - top.asInstanceOf[Float]
+        case 'd' => ctx.pop().asInstanceOf[Double] - top.asInstanceOf[Double]
+      }
+      case "mul" => prefix match {
+        case 'i' => ctx.pop().asInstanceOf[Int] * top.asInstanceOf[Int]
+        case 'l' => ctx.pop().asInstanceOf[Long] * top.asInstanceOf[Long]
+        case 'f' => ctx.pop().asInstanceOf[Float] * top.asInstanceOf[Float]
+        case 'd' => ctx.pop().asInstanceOf[Double] * top.asInstanceOf[Double]
+      }
+      case "div" => prefix match {
+        case 'i' => ctx.pop().asInstanceOf[Int] / top.asInstanceOf[Int]
+        case 'l' => ctx.pop().asInstanceOf[Long] / top.asInstanceOf[Long]
+        case 'f' => ctx.pop().asInstanceOf[Float] / top.asInstanceOf[Float]
+        case 'd' => ctx.pop().asInstanceOf[Double] / top.asInstanceOf[Double]
+      }
+      case "rem" => prefix match {
+        case 'i' => ctx.pop().asInstanceOf[Int] % top.asInstanceOf[Int]
+        case 'l' => ctx.pop().asInstanceOf[Long] % top.asInstanceOf[Long]
+        case 'f' => ctx.pop().asInstanceOf[Float] % top.asInstanceOf[Float]
+        case 'd' => ctx.pop().asInstanceOf[Double] % top.asInstanceOf[Double]
+      }
+      case "neg" => prefix match {
+        case 'i' => -top.asInstanceOf[Int]
+        case 'l' => -top.asInstanceOf[Long]
+        case 'f' => -top.asInstanceOf[Float]
+        case 'd' => -top.asInstanceOf[Double]
+      }
+    }
+    ctx.push(prefix match {
+      case 'i' => res.asInstanceOf[Int]
+      case 'l' => res.asInstanceOf[Long]
+      case 'f' => res.asInstanceOf[Float]
+      case 'd' => res.asInstanceOf[Double]
+    })
+  }
 }
 
 class OpMath2(val reader: StreamReader,

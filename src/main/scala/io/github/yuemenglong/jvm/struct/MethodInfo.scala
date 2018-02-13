@@ -2,13 +2,13 @@ package io.github.yuemenglong.jvm.struct
 
 import io.github.yuemenglong.json.lang.JsonIgnore
 import io.github.yuemenglong.jvm.attribute.method.{CodeAttribute, SignatureAttribute}
-import io.github.yuemenglong.jvm.common.{AccessFlagName, StreamReader}
+import io.github.yuemenglong.jvm.common.{AccessFlagName, JvmItem, StreamReader}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/11.
   */
 @JsonIgnore(Array("reader", "cf"))
-class MethodInfo(reader: StreamReader, cf: ClassFile) extends AccessFlagName {
+class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with AccessFlagName {
   val access_flags: Short = reader.readShort()
   val name_index: Short = reader.readShort()
   val descriptor_index: Short = reader.readShort()
@@ -17,16 +17,16 @@ class MethodInfo(reader: StreamReader, cf: ClassFile) extends AccessFlagName {
     AttributeInfo.load(reader, cf, method = this)
   }).toArray
 
-  def nameValue: String = cf.constant_pool(name_index).value.toString
+  def name: String = cf.constant_pool(name_index).value.toString
 
-  def descriptorValue: String = cf.constant_pool(descriptor_index).value.toString
+  def descriptor: String = cf.constant_pool(descriptor_index).value.toString
 
   def code: CodeAttribute = attributes.find(_.isInstanceOf[CodeAttribute]).get.asInstanceOf[CodeAttribute]
 
   def signatures: Array[SignatureAttribute] = attributes.filter(_.isInstanceOf[SignatureAttribute]).map(_.asInstanceOf[SignatureAttribute])
 
   override def toString: String = {
-    s"[Method] ${accessFlagsValue.mkString(",")} ${descriptorValue} ${nameValue} ${signatures.map(_.toString).mkString(",")}\n" +
+    s"[Method] ${accessFlagsValue.mkString(",")} ${descriptor} ${name} ${signatures.map(_.toString).mkString(",")}\n" +
       s"${attributes.map(_.toString).mkString("\n")}"
   }
 

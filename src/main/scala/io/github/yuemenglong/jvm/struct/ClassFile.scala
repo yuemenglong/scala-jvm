@@ -31,8 +31,8 @@ class ClassFile(reader: StreamReader) extends AccessFlagName {
 
   override def toString: String = {
     Array(
-      s"${accessFlagsValue.mkString(",")} [${thisClassValue}] Extends [${superClassValue}]",
-      s"[Interface] ${interfacesValue.mkString(",")}",
+      s"${accessFlagsValue.mkString(",")} [${name}] Extends [${parent}] Implements [${implements.mkString(",")}]",
+      s"[Interface] ${implements.mkString(",")}",
       methods.mkString("\n"),
       fields.mkString("\n"),
       "[ATTRIBUTE]",
@@ -40,16 +40,23 @@ class ClassFile(reader: StreamReader) extends AccessFlagName {
     ).mkString("\n")
   }
 
-  def thisClassValue: String = constant_pool(this_class).value.toString
+  def name: String = constant_pool(this_class).value.toString
 
-  def superClassValue: String = {
+  def parent: String = {
     super_class match {
       case 0 => "NULL"
       case _ => constant_pool(super_class).value.toString
     }
   }
 
-  def interfacesValue: Array[String] = interfaces.map(i => {
+  def method(name: String): MethodInfo = {
+    methods.find(_.name == name) match {
+      case Some(m) => m
+      case None => null
+    }
+  }
+
+  def implements: Array[String] = interfaces.map(i => {
     constant_pool(i).value.toString
   })
 

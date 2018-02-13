@@ -23,7 +23,7 @@ class OpLoad(reader: StreamReader,
             ) extends Op {
   val index = opCode match {
     case c if 0x15 <= c && c <= 0x19 => reader.readByte().toInt
-    case c if 0x1A <= c && c <= 0x2D => (opCode - 0x1A) % 4 + 1
+    case c if 0x1A <= c && c <= 0x2D => (opCode - 0x1A) % 4
   }
 
   override val opName = {
@@ -31,8 +31,8 @@ class OpLoad(reader: StreamReader,
       case c if 0x15 <= c && c <= 0x19 => "ilfda".charAt(opCode - 0x15)
       case c if 0x1A <= c && c <= 0x2D => "ilfda".charAt((opCode - 0x1A) / 4)
     }
-    s"${prefix}load ${index}"
+    s"${prefix}load_${index}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ctx.push(ctx.get(index))
 }

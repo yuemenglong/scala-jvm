@@ -24,7 +24,7 @@ class OpConst(reader: StreamReader,
               val lineNo: Int,
               val opCode: Int,
              ) extends Op {
-  val value = opCode match {
+  def value = opCode match {
     case 0x01 => null
     case 0x02 => -1
     case 0x03 => 0
@@ -53,7 +53,7 @@ class OpConst(reader: StreamReader,
     }
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ctx.push(value)
 }
 
 class OpPush(reader: StreamReader,
@@ -77,5 +77,5 @@ class OpPush(reader: StreamReader,
     case 0x14 => s"ldc2_w ${cp(value)}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = ctx.push(value)
 }

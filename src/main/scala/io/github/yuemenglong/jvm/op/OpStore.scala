@@ -25,7 +25,7 @@ class OpStore(reader: StreamReader,
              ) extends Op {
   val index = opCode match {
     case c if 0x36 <= c && c <= 0x3A => reader.readByte().toInt
-    case c if 0x3B <= c && c <= 0x4E => (opCode - 0x3B) % 4 + 1
+    case c if 0x3B <= c && c <= 0x4E => (opCode - 0x3B) % 4
   }
 
   override val opName = {
@@ -33,8 +33,11 @@ class OpStore(reader: StreamReader,
       case c if 0x36 <= c && c <= 0x3A => "ilfda".charAt(opCode - 0x36)
       case c if 0x3B <= c && c <= 0x4E => "ilfda".charAt((opCode - 0x3B) / 4)
     }
-    s"${prefix}store ${index}"
+    s"${prefix}store_${index}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val value = ctx.pop()
+    ctx.set(index, value)
+  }
 }
