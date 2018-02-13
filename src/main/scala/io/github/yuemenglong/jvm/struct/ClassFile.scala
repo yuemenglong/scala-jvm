@@ -41,12 +41,12 @@ class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
     ).mkString("\n")
   }
 
-  def name: String = cpv(this_class).value.toString
+  def name: String = cp(this_class).asInstanceOf[ConstantClassInfo].name
 
   def parent: String = {
     super_class match {
       case 0 => "NULL"
-      case _ => cpv(super_class).value.toString
+      case _ => cp(super_class).asInstanceOf[ConstantClassInfo].name
     }
   }
 

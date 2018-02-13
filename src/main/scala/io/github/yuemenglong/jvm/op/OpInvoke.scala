@@ -82,7 +82,18 @@ class OpInvokeStatic(val reader: StreamReader,
   override def proc(ctx: ThreadCtx): Unit = {
     val ref = cp(index).asInstanceOf[ConstantMethodrefInfo]
     val method = ctx.rt.clazzMap(ref.clazz).method(ref.name, ref.descriptor)
-    ctx.call(method)
+    var idx = 0
+    var map = Map[Int, Any]()
+    method.paramsType.foreach(_ => {
+      val p = ctx.pop()
+      map += (idx -> p)
+      idx += 1
+      if (p.isInstanceOf[Double] || p.isInstanceOf[Long]) {
+        //        map += (idx -> p)
+        idx += 1
+      }
+    })
+    ctx.call(method, map)
   }
 }
 

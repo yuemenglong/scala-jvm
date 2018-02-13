@@ -21,6 +21,22 @@ class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with A
 
   def descriptor: String = cpv(descriptor_index).value.toString
 
+  def paramsType: Array[String] = {
+    val contentRe = """\((.*)\).*""".r
+    val content = descriptor match {
+      case contentRe(c) => c
+    }
+    val re = """((\[?[BCDFIJSZ])|(\[?L.+?;))""".r
+    re.findAllMatchIn(content).map(_.group(0)).toArray
+  }
+
+  def returnType: String = {
+    val re = """\(.*\)(.*)""".r
+    descriptor match {
+      case re(t) => t
+    }
+  }
+
   def code: CodeAttribute = attributes.find(_.isInstanceOf[CodeAttribute]).get.asInstanceOf[CodeAttribute]
 
   def signatures: Array[SignatureAttribute] = attributes.filter(_.isInstanceOf[SignatureAttribute]).map(_.asInstanceOf[SignatureAttribute])

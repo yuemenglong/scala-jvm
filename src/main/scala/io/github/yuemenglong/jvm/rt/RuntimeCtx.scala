@@ -22,38 +22,14 @@ class RuntimeCtx {
 
 class ThreadCtx(val method: MethodInfo, val rt: RuntimeCtx) {
   var frames: ArrayBuffer[Frame] = new ArrayBuffer[Frame]()
+  var stack: ArrayBuffer[Any] = new ArrayBuffer[Any]()
   frames += new Frame(method)
 
   def pc = frame.pc
 
   def frame = frames.last
 
-  def push(value: Any): Unit = frame.push(value)
-
-  def pop(): Any = frame.pop()
-
-  def get(idx: Int): Any = frame.get(idx)
-
-  def set(idx: Int, value: Any): Unit = frame.set(idx, value)
-
-  def call(method: MethodInfo): Unit = {
-    val frame = new Frame(method)
-    frames += frame
-  }
-
-  def inc(): Unit = {
-    frame.pc += 1
-  }
-}
-
-class Frame(val method: MethodInfo) {
-  var pc: Int = 0
-  var localVariable: Map[Int, Any] = Map()
-  var stack: ArrayBuffer[Any] = new ArrayBuffer[Any]()
-
-  def push(value: Any): Unit = {
-    stack += value
-  }
+  def push(value: Any): Unit = stack += value
 
   def pop(): Any = {
     val ret = stack.last
@@ -61,19 +37,39 @@ class Frame(val method: MethodInfo) {
     ret
   }
 
+  def get(idx: Int): Any = frame.get(idx)
+
+  def set(idx: Int, value: Any): Unit = frame.set(idx, value)
+
+  def call(method: MethodInfo, params: Map[Int, Any]): Unit = {
+    val frame = new Frame(method, params)
+    frames += frame
+  }
+
+  def inc(): Unit = {
+    frame.pc += 1
+  }
+
+  override def toString = {
+    val l = frame.localVariable.toArray.sortBy(_._1).map { case (idx, value) =>
+      s"[Local] [${idx}] ${value}"
+    }.mkString("\n")
+    val s = stack.map(v => s"[Stack] ${v}").mkString("\n")
+    s"${l}\n${s}"
+  }
+}
+
+class Frame(val method: MethodInfo, map: Map[Int, Any] = Map()) {
+  var pc: Int = 0
+  var localVariable: Map[Int, Any] = map
+
   def get(idx: Int): Any = localVariable(idx)
 
   def set(idx: Int, value: Any): Unit = localVariable += (idx -> value)
 
   def code(pc: Int) = method.code.code(pc)
 
-  override def toString = {
-    val l = localVariable.toArray.sortBy(_._1).map { case (idx, value) =>
-      s"[Local] [${idx}] ${value}"
-    }.mkString("\n")
-    val s = stack.map(v => s"[Stack] ${v}").mkString("\n")
-    s"${l}\n${s}"
-  }
+
 }
 
 

@@ -12,7 +12,7 @@ object Vm {
     while (!isFinish) {
       val code = ctx.frame.code(ctx.pc)
       ctx.inc()
-      println(ctx.frame)
+      println(ctx)
       println(s"${code}")
       code.proc(ctx)
     }
@@ -20,6 +20,7 @@ object Vm {
 
   def run(method: MethodInfo): Any = {
     val runtimeCtx = new RuntimeCtx
+    runtimeCtx.clazzMap += (method.cf.name -> method.cf)
     run(runtimeCtx.newThread(method))
   }
 }
