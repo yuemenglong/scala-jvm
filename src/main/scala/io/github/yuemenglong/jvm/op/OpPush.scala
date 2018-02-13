@@ -13,7 +13,8 @@ object OpPush {
   def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
       case c if 0x01 <= c && c <= 0x0F => new OpConst(reader, cf, method, lineNo, code)
-      case c if 0x10 <= c && c <= 0x14 => new OpPush(reader, cf, method, lineNo, code)
+      case c if 0x10 <= c && c <= 0x11 => new OpPush(reader, cf, method, lineNo, code)
+      case c if 0x12 <= c && c <= 0x14 => new OpLdc(reader, cf, method, lineNo, code)
     }
   }
 }
@@ -65,17 +66,32 @@ class OpPush(reader: StreamReader,
   val value = opCode match {
     case 0x10 => reader.readByte()
     case 0x11 => reader.readShort()
+  }
+  override val opName = opCode match {
+    case 0x10 => s"bipush ${value}"
+    case 0x11 => s"sipush ${value}"
+  }
+
+  override def proc(ctx: ThreadCtx): Unit = ctx.push(value)
+}
+
+
+class OpLdc(reader: StreamReader,
+            override val cf: ClassFile,
+            override val method: MethodInfo,
+            val lineNo: Int,
+            val opCode: Int,
+           ) extends Op {
+  val index = opCode match {
     case 0x12 => reader.readByte()
     case 0x13 => reader.readShort()
     case 0x14 => reader.readShort()
   }
   override val opName = opCode match {
-    case 0x10 => s"bipush ${value}"
-    case 0x11 => s"sipush ${value}"
-    case 0x12 => s"ldc ${cp(value)}"
-    case 0x13 => s"ldc_w ${cp(value)}"
-    case 0x14 => s"ldc2_w ${cp(value)}"
+    case 0x12 => s"ldc ${cp(index)}"
+    case 0x13 => s"ldc_w ${cp(index)}"
+    case 0x14 => s"ldc2_w ${cp(index)}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ctx.push(value)
+  override def proc(ctx: ThreadCtx): Unit = ctx.push(cpv(index).value)
 }

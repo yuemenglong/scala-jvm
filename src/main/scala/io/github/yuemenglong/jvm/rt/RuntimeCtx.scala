@@ -11,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 
 class RuntimeCtx {
   var heap: Any = _
-  var methodArea: Map[String, ClassFile] = Map()
+  var clazzMap: Map[String, ClassFile] = Map()
   var threads: ArrayBuffer[ThreadCtx] = new ArrayBuffer[ThreadCtx]()
 
   def newThread(method: MethodInfo): ThreadCtx = {
@@ -21,9 +21,10 @@ class RuntimeCtx {
 }
 
 class ThreadCtx(val method: MethodInfo, val rt: RuntimeCtx) {
-  var pc: Int = 0
   var frames: ArrayBuffer[Frame] = new ArrayBuffer[Frame]()
   frames += new Frame(method)
+
+  def pc = frame.pc
 
   def frame = frames.last
 
@@ -34,9 +35,19 @@ class ThreadCtx(val method: MethodInfo, val rt: RuntimeCtx) {
   def get(idx: Int): Any = frame.get(idx)
 
   def set(idx: Int, value: Any): Unit = frame.set(idx, value)
+
+  def call(method: MethodInfo): Unit = {
+    val frame = new Frame(method)
+    frames += frame
+  }
+
+  def inc(): Unit = {
+    frame.pc += 1
+  }
 }
 
 class Frame(val method: MethodInfo) {
+  var pc: Int = 0
   var localVariable: Map[Int, Any] = Map()
   var stack: ArrayBuffer[Any] = new ArrayBuffer[Any]()
 
@@ -46,7 +57,7 @@ class Frame(val method: MethodInfo) {
 
   def pop(): Any = {
     val ret = stack.last
-    stack.remove(stack.length - 1)
+    stack -= ret
     ret
   }
 

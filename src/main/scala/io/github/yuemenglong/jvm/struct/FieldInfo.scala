@@ -16,9 +16,9 @@ class FieldInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with Ac
     AttributeInfo.load(reader, cf)
   }).toArray
 
-  def name: String = cp(name_index)
+  def name: String = cp(name_index).toString
 
-  def descriptor: String = cp(descriptor_index)
+  def descriptor: String = cp(descriptor_index).toString
 
   override def toString = {
     s"[Field] ${accessFlagsValue} ${descriptor} ${name}\n" +

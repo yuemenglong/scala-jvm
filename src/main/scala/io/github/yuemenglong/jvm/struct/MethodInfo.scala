@@ -17,9 +17,9 @@ class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with A
     AttributeInfo.load(reader, cf, method = this)
   }).toArray
 
-  def name: String = cf.constant_pool(name_index).value.toString
+  def name: String = cpv(name_index).value.toString
 
-  def descriptor: String = cf.constant_pool(descriptor_index).value.toString
+  def descriptor: String = cpv(descriptor_index).value.toString
 
   def code: CodeAttribute = attributes.find(_.isInstanceOf[CodeAttribute]).get.asInstanceOf[CodeAttribute]
 

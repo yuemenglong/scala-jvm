@@ -7,7 +7,7 @@ object AttributeInfo {
   def load(reader: StreamReader, cf: ClassFile, method: MethodInfo = null): AttributeInfo = {
     val attribute_name_index = reader.readShort()
     val attribute_length = reader.readInt()
-    val name = s"${cf.constant_pool(attribute_name_index).value}"
+    val name = s"${cf.constant_pool(attribute_name_index).asInstanceOf[ValuedCpInfo].value}"
     name match {
       case "Code" => new CodeAttribute(reader, cf, method, attribute_name_index, attribute_length)
       case "LocalVariableTable" => new LocalVariableTableAttribute(reader, cf, method, attribute_name_index, attribute_length)
@@ -22,7 +22,7 @@ trait AttributeInfo extends JvmItem {
   val attribute_name_index: Short
   val attribute_length: Int
 
-  def name: String = s"${cf.constant_pool(attribute_name_index).value}"
+  def name: String = s"${cpv(attribute_name_index).value}"
 
   override def toString = name + "???"
 }

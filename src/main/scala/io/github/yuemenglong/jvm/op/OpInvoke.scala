@@ -2,7 +2,7 @@ package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.StreamReader
 import io.github.yuemenglong.jvm.rt.ThreadCtx
-import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
+import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantMethodrefInfo, MethodInfo}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -79,7 +79,11 @@ class OpInvokeStatic(val reader: StreamReader,
     s"invokestatic ${cf.constant_pool(index)}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val ref = cp(index).asInstanceOf[ConstantMethodrefInfo]
+    val method = ctx.rt.clazzMap(ref.clazz).method(ref.name, ref.descriptor)
+    ctx.call(method)
+  }
 }
 
 class OpInvokeVirtual(val reader: StreamReader,

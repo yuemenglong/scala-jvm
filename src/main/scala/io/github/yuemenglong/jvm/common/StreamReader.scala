@@ -34,4 +34,6 @@ class StreamReader(stream: Seq[Byte]) {
   def readFloat(): Float = readT(4, _.getFloat())
 
   def readDouble(): Double = readT(8, _.getDouble())
+
+  def readString(len: Int): String = new String(readBytes(len))
 }

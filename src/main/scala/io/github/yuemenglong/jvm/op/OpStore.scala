@@ -28,11 +28,12 @@ class OpStore(reader: StreamReader,
     case c if 0x3B <= c && c <= 0x4E => (opCode - 0x3B) % 4
   }
 
+  val prefix = opCode match {
+    case c if 0x36 <= c && c <= 0x3A => "ilfda".charAt(opCode - 0x36)
+    case c if 0x3B <= c && c <= 0x4E => "ilfda".charAt((opCode - 0x3B) / 4)
+  }
+
   override val opName = {
-    val prefix = opCode match {
-      case c if 0x36 <= c && c <= 0x3A => "ilfda".charAt(opCode - 0x36)
-      case c if 0x3B <= c && c <= 0x4E => "ilfda".charAt((opCode - 0x3B) / 4)
-    }
     s"${prefix}store_${index}"
   }
 

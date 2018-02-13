@@ -11,7 +11,7 @@ object Vm {
 
     while (!isFinish) {
       val code = ctx.frame.code(ctx.pc)
-      ctx.pc += 1
+      ctx.inc()
       println(ctx.frame)
       println(s"${code}")
       code.proc(ctx)

@@ -1,8 +1,9 @@
 package io.github.yuemenglong.jvm.struct
 
-import io.github.yuemenglong.jvm.common.{AccessFlagName, StreamReader}
+import io.github.yuemenglong.jvm.common.{AccessFlagName, JvmItem, StreamReader}
 
-class ClassFile(reader: StreamReader) extends AccessFlagName {
+class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
+  val cf = this
   val magic: Int = reader.readInt()
   require(magic == 0xCAFEBABE)
   val minor_version: Short = reader.readShort()
@@ -40,24 +41,28 @@ class ClassFile(reader: StreamReader) extends AccessFlagName {
     ).mkString("\n")
   }
 
-  def name: String = constant_pool(this_class).value.toString
+  def name: String = cpv(this_class).value.toString
 
   def parent: String = {
     super_class match {
       case 0 => "NULL"
-      case _ => constant_pool(super_class).value.toString
+      case _ => cpv(super_class).value.toString
     }
   }
 
-  def method(name: String): MethodInfo = {
-    methods.find(_.name == name) match {
+  def method(name: String): Array[MethodInfo] = {
+    methods.filter(m => m.name == name)
+  }
+
+  def method(name: String, descriptor: String): MethodInfo = {
+    methods.find(m => m.name == name && m.descriptor == descriptor) match {
       case Some(m) => m
       case None => null
     }
   }
 
   def implements: Array[String] = interfaces.map(i => {
-    constant_pool(i).value.toString
+    cpv(i).value.toString
   })
 
   override def accessMaskMap = Map(

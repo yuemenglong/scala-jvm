@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.common
 
 import io.github.yuemenglong.json.lang.JsonIgnore
-import io.github.yuemenglong.jvm.struct.ClassFile
+import io.github.yuemenglong.jvm.struct.{ClassFile, CpInfo, ValuedCpInfo}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/11.
@@ -10,5 +10,7 @@ import io.github.yuemenglong.jvm.struct.ClassFile
 trait JvmItem {
   val cf: ClassFile
 
-  def cp(idx: Int): String = cf.constant_pool(idx).toString
+  def cp(idx: Int): CpInfo = cf.constant_pool(idx)
+
+  def cpv(idx: Int) = cp(idx).asInstanceOf[ValuedCpInfo]
 }
