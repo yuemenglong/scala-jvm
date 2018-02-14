@@ -15,11 +15,10 @@ object Vm {
     while (!isFinish) {
       println(ctx)
       val code = ctx.code()
-      println(s"[${code.lineNo}] ${code}")
+      println(f"[${code.lineNo}] ${code}")
       ctx.inc()
       code.proc(ctx)
     }
-    println("Finish")
   }
 
   def run(method: MethodInfo): Any = {

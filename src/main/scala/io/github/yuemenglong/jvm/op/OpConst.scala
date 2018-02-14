@@ -13,7 +13,8 @@ object OpConst {
       case c if 0x00 <= c && c <= 0x00 => new OpNop(reader, cf, method, lineNo, code)
       case c if 0x01 <= c && c <= 0x0F => new OpConst(reader, cf, method, lineNo, code)
       case c if 0x10 <= c && c <= 0x11 => new OpPush(reader, cf, method, lineNo, code)
-      case c if 0x12 <= c && c <= 0x14 => new OpLdc(reader, cf, method, lineNo, code)
+      case c if 0x12 <= c && c <= 0x12 => new OpLdc(reader, cf, method, lineNo, code)
+      case c if 0x13 <= c && c <= 0x14 => new OpLdcW(reader, cf, method, lineNo, code)
     }
   }
 }
@@ -74,13 +75,22 @@ class OpPush(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, va
 
 
 class OpLdc(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
-  val index = opCode match {
-    case 0x12 => reader.readByte()
-    case 0x13 => reader.readShort()
-    case 0x14 => reader.readShort()
+  val index: Byte = reader.readByte()
+  override val opName = {
+    s"ldc ${cp(index)}"
   }
+
+  override def proc(ctx: ThreadCtx): Unit = {
+    val value = cpv(index).value
+    val is8Byte = value.isInstanceOf[Long] || value.isInstanceOf[Double]
+    require(!is8Byte)
+    ctx.push(value)
+  }
+}
+
+class OpLdcW(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
+  val index: Short = reader.readShort()
   override val opName = opCode match {
-    case 0x12 => s"ldc ${cp(index)}"
     case 0x13 => s"ldc_w ${cp(index)}"
     case 0x14 => s"ldc2_w ${cp(index)}"
   }
@@ -89,10 +99,10 @@ class OpLdc(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val
     val value = cpv(index).value
     val is8Byte = value.isInstanceOf[Long] || value.isInstanceOf[Double]
     opCode match {
-      case 0x12 => require(!is8Byte)
       case 0x13 => require(!is8Byte)
       case 0x14 => require(is8Byte)
     }
     ctx.push(value)
   }
 }
+

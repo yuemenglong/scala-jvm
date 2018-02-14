@@ -13,6 +13,11 @@ class StreamReader(seq: Seq[Byte]) {
     fn(wrap)
   }
 
+  private def readTR[T](len: Int, fn: ByteBuffer => T): T = {
+    val wrap = ByteBuffer.wrap(readBytes(len).reverse)
+    fn(wrap)
+  }
+
   def readBytes(len: Int): Array[Byte] = {
     val arr = s.slice(0, len).toArray
     s = s.drop(len)
@@ -27,7 +32,11 @@ class StreamReader(seq: Seq[Byte]) {
 
   def readShort(): Short = readT(2, _.getShort())
 
+  def readShortR(): Short = readTR(2, _.getShort())
+
   def readInt(): Int = readT(4, _.getInt())
+
+  def readIntR(): Int = readTR(4, _.getInt())
 
   def readLong(): Long = readT(8, _.getLong())
 
@@ -36,4 +45,5 @@ class StreamReader(seq: Seq[Byte]) {
   def readDouble(): Double = readT(8, _.getDouble())
 
   def readString(len: Int): String = new String(readBytes(len))
+
 }

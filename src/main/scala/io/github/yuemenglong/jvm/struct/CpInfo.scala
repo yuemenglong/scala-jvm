@@ -163,7 +163,7 @@ class ConstantInterfaceMethodrefInfo(reader: StreamReader, override val cf: Clas
   val class_index: Short = reader.readShort()
   val name_and_type_index: Short = reader.readShort()
 
-  def clazz: String = cpv(class_index).value.toString
+  def clazz: String = cpc(class_index).name.toString
 
   def name: String = cp(name_and_type_index).asInstanceOf[ConstantNameAndTypeInfo].name
 

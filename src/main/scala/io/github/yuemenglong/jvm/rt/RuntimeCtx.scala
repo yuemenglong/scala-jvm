@@ -3,11 +3,12 @@ package io.github.yuemenglong.jvm.rt
 import java.io.{File, FileInputStream}
 
 import io.github.yuemenglong.jvm.common.StreamReader
-import io.github.yuemenglong.jvm.op.Op
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.tools.nsc.interpreter.InputStream
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -40,10 +41,29 @@ class RuntimeCtx {
     if (file.isDirectory) {
       file.listFiles().foreach(load)
     } else if (file.getName.endsWith(".class")) {
-      val reader = new StreamReader(read(new FileInputStream(file)))
-      val cf = new ClassFile(reader)
-      clazzMap += (cf.name -> cf)
+      load(new FileInputStream(file))
+    } else if (file.getName.endsWith(".jar")) {
+      val jf = new JarFile(file)
+      val es = jf.entries()
+      Stream.continually({
+        es.hasMoreElements match {
+          case true => es.nextElement()
+          case false => null
+        }
+      }).takeWhile(_ != null).foreach(je => {
+        if (!je.isDirectory && je.getName.endsWith(".class")) {
+          println(s"[Jar] ${je.getName}")
+          load(jf.getInputStream(je))
+        }
+      })
     }
+  }
+
+  def load(is: InputStream): Unit = {
+    val reader = new StreamReader(read(is))
+    val cf = new ClassFile(reader)
+    clazzMap += (cf.name -> cf)
+    println(s"[Load] ${cf.name}")
   }
 }
 

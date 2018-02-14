@@ -28,6 +28,7 @@ object OpRef {
 }
 
 class OpStatic(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
+  val index: Short = reader.readShort()
   val prefix = (opCode - 0xB2) % 2 match {
     case 0 => "get"
     case 1 => "put"
