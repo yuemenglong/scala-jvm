@@ -32,6 +32,7 @@ object Op {
         case c if 0x36 <= c && c <= 0x56 => OpStore.load(reader, cf, method, lineNo, code)
         case c if 0x57 <= c && c <= 0x5F => OpStack.load(reader, cf, method, lineNo, code)
         case c if 0x60 <= c && c <= 0x84 => OpMath.load(reader, cf, method, lineNo, code)
+        case c if 0x85 <= c && c <= 0x93 => OpConvert.load(reader, cf, method, lineNo, code)
         case c if 0x94 <= c && c <= 0xA6 => OpCmp.load(reader, cf, method, lineNo, code)
         case c if 0xA7 <= c && c <= 0xA7 => OpCtrl.load(reader, cf, method, lineNo, code)
         case c if 0xAC <= c && c <= 0xB1 => OpReturn.load(reader, cf, method, lineNo, code)
