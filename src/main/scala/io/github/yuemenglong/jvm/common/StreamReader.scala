@@ -5,8 +5,8 @@ import java.nio.ByteBuffer
 /**
   * Created by <yuemenglong@126.com> on 2018/2/8.
   */
-class StreamReader(stream: Seq[Byte]) {
-  var s = stream
+class StreamReader(seq: Seq[Byte]) {
+  var s = seq
 
   private def readT[T](len: Int, fn: ByteBuffer => T): T = {
     val wrap = ByteBuffer.wrap(readBytes(len))
