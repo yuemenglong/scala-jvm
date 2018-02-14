@@ -4,8 +4,6 @@ import io.github.yuemenglong.jvm.common.{StreamReader, Types}
 import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
-import scala.reflect.{ClassTag, classTag}
-
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
@@ -20,12 +18,7 @@ object OpConst {
   }
 }
 
-class OpNop(val reader: StreamReader,
-            override val cf: ClassFile,
-            override val method: MethodInfo,
-            val lineNo: Int,
-            val opCode: Int,
-           ) extends Op {
+class OpNop(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   override val opName = {
     "nop"
   }
@@ -33,12 +26,7 @@ class OpNop(val reader: StreamReader,
   override def proc(ctx: ThreadCtx): Unit = {}
 }
 
-class OpConst(reader: StreamReader,
-              override val cf: ClassFile,
-              override val method: MethodInfo,
-              val lineNo: Int,
-              val opCode: Int,
-             ) extends Op {
+class OpConst(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   def value = opCode match {
     case 0x01 => null
     case 0x02 => -1
@@ -71,12 +59,7 @@ class OpConst(reader: StreamReader,
   override def proc(ctx: ThreadCtx): Unit = ctx.push(value)
 }
 
-class OpPush(reader: StreamReader,
-             override val cf: ClassFile,
-             override val method: MethodInfo,
-             val lineNo: Int,
-             val opCode: Int,
-            ) extends Op {
+class OpPush(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val value = opCode match {
     case 0x10 => reader.readByte()
     case 0x11 => reader.readShort()
@@ -90,12 +73,7 @@ class OpPush(reader: StreamReader,
 }
 
 
-class OpLdc(reader: StreamReader,
-            override val cf: ClassFile,
-            override val method: MethodInfo,
-            val lineNo: Int,
-            val opCode: Int,
-           ) extends Op {
+class OpLdc(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val index = opCode match {
     case 0x12 => reader.readByte()
     case 0x13 => reader.readShort()
@@ -107,5 +85,14 @@ class OpLdc(reader: StreamReader,
     case 0x14 => s"ldc2_w ${cp(index)}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ctx.push(cpv(index).value)
+  override def proc(ctx: ThreadCtx): Unit = {
+    val value = cpv(index).value
+    val is8Byte = value.isInstanceOf[Long] || value.isInstanceOf[Double]
+    opCode match {
+      case 0x12 => require(!is8Byte)
+      case 0x13 => require(!is8Byte)
+      case 0x14 => require(is8Byte)
+    }
+    ctx.push(value)
+  }
 }

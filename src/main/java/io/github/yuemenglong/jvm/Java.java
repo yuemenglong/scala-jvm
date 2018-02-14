@@ -5,8 +5,8 @@ package io.github.yuemenglong.jvm;
 
 public class Java {
     public static void main(String args[]) {
-        double a = 1;
-        double b = 2;
+        int a = 1;
+        int b = 2;
         double c = sub(a, b);
     }
 

@@ -28,5 +28,22 @@ class OpConvert(val reader: StreamReader,
   val postfix = "lfdifdildilfbcs".charAt(opCode - 0x85)
   override val opName = s"${prefix}2${postfix}"
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val value = prefix match {
+      case 'i' => ctx.pop().asInstanceOf[Int]
+      case 'l' => ctx.pop().asInstanceOf[Long]
+      case 'f' => ctx.pop().asInstanceOf[Float]
+      case 'd' => ctx.pop().asInstanceOf[Double]
+    }
+    val res = postfix match {
+      case 'i' => value.toInt
+      case 'l' => value.toLong
+      case 'f' => value.toFloat
+      case 'd' => value.toDouble
+      case 'b' => value.toByte
+      case 'c' => value.toChar
+      case 's' => value.toShort
+    }
+    ctx.push(res)
+  }
 }
