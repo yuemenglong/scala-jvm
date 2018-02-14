@@ -34,11 +34,8 @@ object Op {
         case c if 0x60 <= c && c <= 0x84 => OpMath.load(reader, cf, method, lineNo, code)
         case c if 0x85 <= c && c <= 0x93 => OpConvert.load(reader, cf, method, lineNo, code)
         case c if 0x94 <= c && c <= 0xA6 => OpCmp.load(reader, cf, method, lineNo, code)
-        case c if 0xA7 <= c && c <= 0xA7 => OpCtrl.load(reader, cf, method, lineNo, code)
-        case c if 0xAC <= c && c <= 0xB1 => OpReturn.load(reader, cf, method, lineNo, code)
-        case c if 0xB6 <= c && c <= 0xBA => OpInvoke.load(reader, cf, method, lineNo, code)
-        case c if 0xBB <= c && c <= 0xBD => OpNew.load(reader, cf, method, lineNo, code)
-        case c if 0xBF <= c && c <= 0xBF => OpUtil.load(reader, cf, method, lineNo, code)
+        case c if 0xA7 <= c && c <= 0xB1 => OpCtrl.load(reader, cf, method, lineNo, code)
+        case c if 0xB2 <= c && c <= 0xC3 => OpRef.load(reader, cf, method, lineNo, code)
         case _ => new OpOther(reader, cf, method, lineNo, code, reader.readBytes(reader.length.toInt - rest.toInt))
       }
       ret += op
