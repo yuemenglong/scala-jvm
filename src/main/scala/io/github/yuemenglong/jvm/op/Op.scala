@@ -36,6 +36,7 @@ object Op {
         case c if 0x94 <= c && c <= 0xA6 => OpCmp.load(reader, cf, method, lineNo, code)
         case c if 0xA7 <= c && c <= 0xB1 => OpCtrl.load(reader, cf, method, lineNo, code)
         case c if 0xB2 <= c && c <= 0xC3 => OpRef.load(reader, cf, method, lineNo, code)
+        case c if 0xC4 <= c && c <= 0xC9 => OpExt.load(reader, cf, method, lineNo, code)
         case _ => new OpOther(reader, cf, method, lineNo, code, reader.readBytes(reader.length.toInt - rest.toInt))
       }
       ret += op
