@@ -13,6 +13,7 @@ object OpStore {
   def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
       case c if 0x36 <= c && c <= 0x4E => new OpStore(reader, cf, method, lineNo, code)
+      case c if 0x3F <= c && c <= 0x56 => new OpAStore(reader, cf, method, lineNo, code)
     }
   }
 }
@@ -41,4 +42,16 @@ class OpStore(reader: StreamReader,
     val value = ctx.pop()
     ctx.set(index, value)
   }
+}
+
+class OpAStore(reader: StreamReader,
+               override val cf: ClassFile,
+               override val method: MethodInfo,
+               val lineNo: Int,
+               val opCode: Int
+              ) extends Op {
+  val prefix = "ilfdabcs".charAt(opCode - 0x4F)
+  override val opName = s"${prefix}astore"
+
+  override def proc(ctx: ThreadCtx): Unit = ???
 }

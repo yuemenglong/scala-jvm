@@ -28,8 +28,8 @@ object Op {
       val code = (reader.readByte() + 256) % 256
       val op = code match {
         case c if 0x00 <= c && c <= 0x14 => OpConst.load(reader, cf, method, lineNo, code)
-        case c if 0x15 <= c && c <= 0x2D => OpLoad.load(reader, cf, method, lineNo, code)
-        case c if 0x36 <= c && c <= 0x4E => OpStore.load(reader, cf, method, lineNo, code)
+        case c if 0x15 <= c && c <= 0x35 => OpLoad.load(reader, cf, method, lineNo, code)
+        case c if 0x36 <= c && c <= 0x56 => OpStore.load(reader, cf, method, lineNo, code)
         case c if 0x57 <= c && c <= 0x58 => OpPop.load(reader, cf, method, lineNo, code)
         case c if 0x59 <= c && c <= 0x5F => OpDup.load(reader, cf, method, lineNo, code)
         case c if 0x60 <= c && c <= 0x84 => OpMath.load(reader, cf, method, lineNo, code)
