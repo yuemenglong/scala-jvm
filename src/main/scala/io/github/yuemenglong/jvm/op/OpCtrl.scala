@@ -23,12 +23,7 @@ object OpCtrl {
   }
 }
 
-class OpGoto(val reader: StreamReader,
-             override val cf: ClassFile,
-             override val method: MethodInfo,
-             val lineNo: Int,
-             val opCode: Int,
-            ) extends Op {
+class OpGoto(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val offset: Short = reader.readShort()
   override val opName = {
     s"goto ${offset}"
@@ -37,12 +32,8 @@ class OpGoto(val reader: StreamReader,
   override def proc(ctx: ThreadCtx): Unit = ???
 }
 
-class OpJsr(val reader: StreamReader,
-            override val cf: ClassFile,
-            override val method: MethodInfo,
-            val lineNo: Int,
-            val opCode: Int,
-           ) extends Op {
+class OpJsr(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
+
   val offset: Short = reader.readShort()
   override val opName = {
     s"jsr ${offset}"
@@ -51,12 +42,7 @@ class OpJsr(val reader: StreamReader,
   override def proc(ctx: ThreadCtx): Unit = ???
 }
 
-class OpRet(val reader: StreamReader,
-            override val cf: ClassFile,
-            override val method: MethodInfo,
-            val lineNo: Int,
-            val opCode: Int,
-           ) extends Op {
+class OpRet(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val varnum: Byte = reader.readByte()
   override val opName = {
     s"ret ${varnum}"
@@ -65,12 +51,7 @@ class OpRet(val reader: StreamReader,
   override def proc(ctx: ThreadCtx): Unit = ???
 }
 
-class OpTableSwitch(val reader: StreamReader,
-                    override val cf: ClassFile,
-                    override val method: MethodInfo,
-                    val lineNo: Int,
-                    val opCode: Int,
-                   ) extends Op {
+class OpTableSwitch(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val pad: Array[Byte] = reader.readBytes(3)
   val dft: Int = reader.readInt()
   val low: Int = reader.readInt()
@@ -83,12 +64,7 @@ class OpTableSwitch(val reader: StreamReader,
   override def proc(ctx: ThreadCtx): Unit = ???
 }
 
-class OpLookupSwitch(val reader: StreamReader,
-                     override val cf: ClassFile,
-                     override val method: MethodInfo,
-                     val lineNo: Int,
-                     val opCode: Int,
-                    ) extends Op {
+class OpLookupSwitch(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val pad = reader.readBytes(3)
   val dft = reader.readInt()
   val npairs = reader.readInt()
@@ -101,12 +77,7 @@ class OpLookupSwitch(val reader: StreamReader,
 }
 
 
-class OpReturn(val reader: StreamReader,
-               override val cf: ClassFile,
-               override val method: MethodInfo,
-               val lineNo: Int,
-               val opCode: Int,
-              ) extends Op {
+class OpReturn(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val prefix = opCode match {
     case 0xAC => "i"
     case 0xAD => "l"

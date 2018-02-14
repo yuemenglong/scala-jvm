@@ -7,15 +7,16 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Created by <yuemenglong@126.com> on 2018/2/14.
   */
-class ThreadCtx(val method: MethodInfo, val rt: RuntimeCtx) {
-
+class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
   var frames: ArrayBuffer[Frame] = new ArrayBuffer[Frame]()
   var stack: ArrayBuffer[Any] = new ArrayBuffer[Any]()
-  frames += new Frame(method)
+  frames += new Frame(m)
 
-  def pc = frame.pc
+  def pc: Int = method.codes(frame.codePos).lineNo
 
-  def frame = frames.last
+  def method: MethodInfo = frame.method
+
+  def frame: Frame = frames.last
 
   def push(value: Any): Unit = stack += value
 
@@ -25,9 +26,11 @@ class ThreadCtx(val method: MethodInfo, val rt: RuntimeCtx) {
     ret
   }
 
-  def get(idx: Int): Any = frame.get(idx)
+  def get(idx: Int): Any = frame.localVariable(idx)
 
-  def set(idx: Int, value: Any): Unit = frame.set(idx, value)
+  def set(idx: Int, value: Any): Unit = frame.localVariable += (idx -> value)
+
+  def code() = method.codes(frame.codePos)
 
   def call(method: MethodInfo, params: Map[Int, Any]): Unit = {
     val frame = new Frame(method, params)
@@ -39,14 +42,24 @@ class ThreadCtx(val method: MethodInfo, val rt: RuntimeCtx) {
   }
 
   def inc(): Unit = {
-    frame.pc += 1
+    frame.codePos += 1
+  }
+
+  def goto(lineNo: Int): Unit = {
+    frame.codePos = method.codes.zipWithIndex.find(_._1.lineNo == lineNo).get._2
   }
 
   override def toString = {
+    val p = s"\t[Pc] ${pc}"
     val l = frame.localVariable.toArray.sortBy(_._1).map { case (idx, value) =>
       s"\t[Local] [${idx}] ${value}"
     }.mkString("\n")
     val s = stack.map(v => s"\t[Stack] ${v}").mkString("\n")
-    s"${l}\n${s}"
+    s"${p}\n${l}\n${s}"
   }
+}
+
+class Frame(val method: MethodInfo, map: Map[Int, Any] = Map()) {
+  var codePos: Int = 0
+  var localVariable: Map[Int, Any] = map
 }

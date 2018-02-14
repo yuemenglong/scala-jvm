@@ -21,12 +21,7 @@ object OpCmp {
   }
 }
 
-class OpCmp(val reader: StreamReader,
-            override val cf: ClassFile,
-            override val method: MethodInfo,
-            val lineNo: Int,
-            val opCode: Int,
-           ) extends Op {
+class OpCmp(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   override val opName = opCode match {
     case 0x94 => "lcmp"
     case 0x95 => "fcmpl"
@@ -38,13 +33,9 @@ class OpCmp(val reader: StreamReader,
   override def proc(ctx: ThreadCtx): Unit = ???
 }
 
-class OpCmp0(val reader: StreamReader,
-             override val cf: ClassFile,
-             override val method: MethodInfo,
-             val lineNo: Int,
-             val opCode: Int,
-            ) extends Op {
+class OpCmp0(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val offset: Short = reader.readShort()
+  val pos = offset + lineNo
 
   val fn: Int => Boolean = opCode match {
     case 0x99 => _ == 0
@@ -63,19 +54,22 @@ class OpCmp0(val reader: StreamReader,
     case 0x9E => "le"
   }
   override val opName = {
-    s"if${postfix} ${offset}"
+    s"if${postfix} ${pos}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val a = ctx.pop().asInstanceOf[Int]
+    if (fn(a)) {
+      ctx.goto(pos)
+    }
+  }
 }
 
-class OpCmpI(val reader: StreamReader,
-             override val cf: ClassFile,
-             override val method: MethodInfo,
-             val lineNo: Int,
-             val opCode: Int,
-            ) extends Op {
+class OpCmpI(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val offset: Short = reader.readShort()
+
+  val pos = offset + lineNo
+
   val fn: (Int, Int) => Boolean = opCode match {
     case 0x9F => (a: Int, b: Int) => a == b
     case 0xA0 => (a: Int, b: Int) => a != b
@@ -93,19 +87,20 @@ class OpCmpI(val reader: StreamReader,
     case 0xA4 => "le"
   }
   override val opName = {
-    s"if_icmp${postfix} ${offset}"
+    s"if_icmp${postfix} ${pos}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val b = ctx.pop().asInstanceOf[Int]
+    val a = ctx.pop().asInstanceOf[Int]
+    if (fn(a, b)) {
+      ctx.goto(pos)
+    }
+  }
 }
 
 
-class OpCmpA(val reader: StreamReader,
-             override val cf: ClassFile,
-             override val method: MethodInfo,
-             val lineNo: Int,
-             val opCode: Int,
-            ) extends Op {
+class OpCmpA(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val offset: Short = reader.readShort()
   val fn: (AnyRef, AnyRef) => Boolean = opCode match {
     case 0xA5 => (a: AnyRef, b: AnyRef) => a == b

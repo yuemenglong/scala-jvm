@@ -5,9 +5,12 @@ package io.github.yuemenglong.jvm;
 
 public class Java {
     public static void main(String args[]) {
-        int a = 1;
-        int b = 2;
-        double c = sub(a, b);
+        int a = 0;
+        if (a > 0) {
+            int i = 3;
+        } else {
+            int i = 4;
+        }
     }
 
     public static double sub(double a, double b) {

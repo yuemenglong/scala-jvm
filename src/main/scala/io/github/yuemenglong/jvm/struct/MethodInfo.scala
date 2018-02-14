@@ -3,6 +3,7 @@ package io.github.yuemenglong.jvm.struct
 import io.github.yuemenglong.json.lang.JsonIgnore
 import io.github.yuemenglong.jvm.attribute.method.{CodeAttribute, SignatureAttribute}
 import io.github.yuemenglong.jvm.common.{AccessFlagName, JvmItem, StreamReader}
+import io.github.yuemenglong.jvm.op.Op
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/11.
@@ -20,6 +21,8 @@ class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with A
   def name: String = cpv(name_index).value.toString
 
   def descriptor: String = cpv(descriptor_index).value.toString
+
+  def codes: Array[Op] = code.code
 
   def paramsType: Array[String] = {
     val contentRe = """\((.*)\).*""".r

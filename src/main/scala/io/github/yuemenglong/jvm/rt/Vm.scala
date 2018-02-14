@@ -13,10 +13,10 @@ object Vm {
     def isFinish: Boolean = ctx.frames.isEmpty
 
     while (!isFinish) {
-      val code = ctx.frame.code(ctx.pc)
-      ctx.inc()
       println(ctx)
-      println(s"${code}")
+      val code = ctx.code()
+      println(s"[${code.lineNo}] ${code}")
+      ctx.inc()
       code.proc(ctx)
     }
     println("Finish")

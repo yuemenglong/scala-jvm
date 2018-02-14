@@ -14,18 +14,13 @@ object OpMath {
            method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
       case c if 0x60 <= c && c <= 0x77 => new OpMath(reader, cf, method, lineNo, code)
-      case c if 0x78 <= c && c <= 0x84 => new OpMath2(reader, cf, method, lineNo, code)
+      case c if 0x78 <= c && c <= 0x83 => new OpMath2(reader, cf, method, lineNo, code)
+      case c if 0x84 <= c && c <= 0x84 => new OpInc(reader, cf, method, lineNo, code)
     }
   }
 }
 
-class OpMath(val reader: StreamReader,
-             override val cf: ClassFile,
-             override val method: MethodInfo,
-             val lineNo: Int,
-             val opCode: Int,
-            ) extends Op {
-
+class OpMath(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val prefix = "ilfd".charAt(opCode % 4)
 
   val op = opCode match {
@@ -90,25 +85,56 @@ class OpMath(val reader: StreamReader,
   }
 }
 
-class OpMath2(val reader: StreamReader,
-              override val cf: ClassFile,
-              override val method: MethodInfo,
-              val lineNo: Int,
-              val opCode: Int,
-             ) extends Op {
+class OpMath2(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
+  val prefix = "il".charAt(opCode % 2)
+
+  val fn = opCode match {
+    case c if 0x78 <= c && c <= 0x79 => "shl"
+    case c if 0x7A <= c && c <= 0x7B => "shr"
+    case c if 0x7C <= c && c <= 0x7D => "ushr"
+    case c if 0x7E <= c && c <= 0x7F => "and"
+    case c if 0x80 <= c && c <= 0x81 => "or"
+    case c if 0x82 <= c && c <= 0x83 => "xor"
+  }
+
   override val opName = {
-    val fn = opCode match {
-      case c if 0x78 <= c && c <= 0x79 => "shl"
-      case c if 0x7A <= c && c <= 0x7B => "shr"
-      case c if 0x7C <= c && c <= 0x7D => "ushr"
-      case c if 0x7E <= c && c <= 0x7F => "and"
-      case c if 0x80 <= c && c <= 0x81 => "or"
-      case c if 0x82 <= c && c <= 0x83 => "xor"
-      case c if 0x84 <= c && c <= 0x84 => "inc"
-    }
-    val prefix = "il".charAt(opCode % 2)
     s"${prefix}${fn}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val b = fn match {
+      case "shl" => ctx.pop().asInstanceOf[Int]
+      case "shr" => ctx.pop().asInstanceOf[Int]
+      case "ushr" => ctx.pop().asInstanceOf[Int]
+      case _ => prefix match {
+        case 'i' => ctx.pop().asInstanceOf[Int]
+        case 'l' => ctx.pop().asInstanceOf[Long]
+      }
+    }
+    val a = prefix match {
+      case 'i' => ctx.pop().asInstanceOf[Int]
+      case 'l' => ctx.pop().asInstanceOf[Long]
+    }
+    val res = fn match {
+      case "shl" => a << b
+      case "shr" => a >> b
+      case "ushr" => a >>> b
+      case "and" => a & b
+      case "or" => a | b
+      case "xor" => a ^ b
+    }
+    ctx.push(res)
+  }
+}
+
+class OpInc(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
+  val varnum = reader.readByte()
+  val n = reader.readByte()
+  override val opName = s"iinc [${varnum}] ${n}"
+
+  override def proc(ctx: ThreadCtx): Unit = {
+    var res = ctx.get(varnum).asInstanceOf[Int]
+    res += n.toInt
+    ctx.set(varnum, res)
+  }
 }

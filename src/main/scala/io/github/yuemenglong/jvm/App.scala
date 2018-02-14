@@ -26,25 +26,8 @@ object App {
   }
 
   def main(args: Array[String]): Unit = {
-    //    val fs = new FileInputStream("target/classes/io/github/yuemenglong/jvm/Java.class")
-    //    val fs = Thread.currentThread().getContextClassLoader.getResourceAsStream("Object.class")
-    //    val stream = read(fs)
-    //    val reader = new StreamReader(stream)
-    //        println(stream.length)
-    //        val a = stream.drop(stream.length - 1)
-    //    val cf = new ClassFile(reader)
-    //    CpInfo.debug(cf.constant_pool)
-    //    println("===================================================================")
-    //    println(cf)
-    //    println("===================================================================")
     Vm.rt.load("target/classes/io/github/yuemenglong/jvm/Java.class")
     Vm.run()
-
-    //    val m = cf.method("main")(0)
-    //    println(m)
-    //    println("===================================================================")
-    //    Vm.run(m)
-    //    println(JSON.pretty(cf.methods(1).attributes(0)))
   }
 }
 

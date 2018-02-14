@@ -23,8 +23,9 @@ object Op {
   def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, length: Int): Array[Op] = {
     val rest = reader.length - length
     val ret = new ArrayBuffer[Op]()
+    val max = reader.length
     while (reader.length > rest) {
-      val lineNo = ret.length
+      val lineNo = (max - reader.length).toInt
       val code = (reader.readByte() + 256) % 256
       val op = code match {
         case c if 0x00 <= c && c <= 0x14 => OpConst.load(reader, cf, method, lineNo, code)
