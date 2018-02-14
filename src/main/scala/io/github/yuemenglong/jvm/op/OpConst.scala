@@ -9,14 +9,28 @@ import scala.reflect.{ClassTag, classTag}
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
-object OpPush {
+object OpConst {
   def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, lineNo: Int, code: Int): Op = {
     code match {
+      case c if 0x00 <= c && c <= 0x00 => new OpNop(reader, cf, method, lineNo, code)
       case c if 0x01 <= c && c <= 0x0F => new OpConst(reader, cf, method, lineNo, code)
       case c if 0x10 <= c && c <= 0x11 => new OpPush(reader, cf, method, lineNo, code)
       case c if 0x12 <= c && c <= 0x14 => new OpLdc(reader, cf, method, lineNo, code)
     }
   }
+}
+
+class OpNop(val reader: StreamReader,
+            override val cf: ClassFile,
+            override val method: MethodInfo,
+            val lineNo: Int,
+            val opCode: Int,
+           ) extends Op {
+  override val opName = {
+    "nop"
+  }
+
+  override def proc(ctx: ThreadCtx): Unit = {}
 }
 
 class OpConst(reader: StreamReader,

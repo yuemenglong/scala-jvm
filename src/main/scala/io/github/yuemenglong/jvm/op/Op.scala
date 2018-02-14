@@ -27,7 +27,7 @@ object Op {
       val lineNo = ret.length
       val code = (reader.readByte() + 256) % 256
       val op = code match {
-        case c if 0x01 <= c && c <= 0x14 => OpPush.load(reader, cf, method, lineNo, code)
+        case c if 0x00 <= c && c <= 0x14 => OpConst.load(reader, cf, method, lineNo, code)
         case c if 0x15 <= c && c <= 0x2D => OpLoad.load(reader, cf, method, lineNo, code)
         case c if 0x36 <= c && c <= 0x4E => OpStore.load(reader, cf, method, lineNo, code)
         case c if 0x57 <= c && c <= 0x58 => OpPop.load(reader, cf, method, lineNo, code)
@@ -47,7 +47,6 @@ object Op {
   }
 }
 
-
 class OpOther(reader: StreamReader,
               override val cf: ClassFile,
               override val method: MethodInfo,
@@ -57,5 +56,7 @@ class OpOther(reader: StreamReader,
              ) extends Op {
   override val opName = (Array(opCode.toByte) ++ bytes).map(b => f"${b}%02X").mkString("-")
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    throw new RuntimeException(f"Op ${bytes(0)}%02X Not Implement")
+  }
 }
