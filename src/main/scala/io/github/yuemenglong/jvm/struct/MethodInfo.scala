@@ -1,6 +1,5 @@
 package io.github.yuemenglong.jvm.struct
 
-import io.github.yuemenglong.json.lang.JsonIgnore
 import io.github.yuemenglong.jvm.attribute.method.{CodeAttribute, SignatureAttribute}
 import io.github.yuemenglong.jvm.common.{AccessFlagName, JvmItem, StreamReader}
 import io.github.yuemenglong.jvm.op.Op
@@ -8,7 +7,6 @@ import io.github.yuemenglong.jvm.op.Op
 /**
   * Created by <yuemenglong@126.com> on 2018/2/11.
   */
-@JsonIgnore(Array("reader", "cf"))
 class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with AccessFlagName {
   val access_flags: Short = reader.readShort()
   val name_index: Short = reader.readShort()

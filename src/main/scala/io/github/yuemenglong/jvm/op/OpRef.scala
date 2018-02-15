@@ -29,11 +29,11 @@ object OpRef {
 
 class OpStatic(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val index: Short = reader.readShort()
-  val prefix = (opCode - 0xB2) % 2 match {
+  val prefix: String = (opCode - 0xB2) % 2 match {
     case 0 => "get"
     case 1 => "put"
   }
-  val postfix = (opCode - 0xB2) / 2 match {
+  val postfix: String = (opCode - 0xB2) / 2 match {
     case 0 => "static"
     case 1 => "field"
   }
@@ -50,9 +50,7 @@ object Invoke {
     val p: Short = reader.readShort()
     require(p == 0)
 
-    override val opName = {
-      s"invokedynamic ${cf.constant_pool(index)}"
-    }
+    override val opName = s"invokedynamic ${cf.constant_pool(index)}"
 
     override def proc(ctx: ThreadCtx): Unit = ???
   }
@@ -63,27 +61,21 @@ object Invoke {
     val p: Byte = reader.readByte()
     require(count > 0 && p == 0)
 
-    override val opName = {
-      s"invokeinterface ${cf.constant_pool(index)}"
-    }
+    override val opName = s"invokeinterface ${cf.constant_pool(index)}"
 
     override def proc(ctx: ThreadCtx): Unit = ???
   }
 
   class OpInvokeSpecial(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
     val index: Short = reader.readShort()
-    override val opName = {
-      s"invokespecial ${cf.constant_pool(index)}"
-    }
+    override val opName = s"invokespecial ${cf.constant_pool(index)}"
 
     override def proc(ctx: ThreadCtx): Unit = ???
   }
 
   class OpInvokeStatic(val reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
     val index: Short = reader.readShort()
-    override val opName = {
-      s"invokestatic ${cf.constant_pool(index)}"
-    }
+    override val opName = s"invokestatic ${cf.constant_pool(index)}"
 
     override def proc(ctx: ThreadCtx): Unit = {
       val ref = cp(index).asInstanceOf[ConstantMethodrefInfo]
@@ -105,9 +97,7 @@ object Invoke {
 
   class OpInvokeVirtual(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
     val index: Short = reader.readShort()
-    override val opName = {
-      s"invokevirtual ${cf.constant_pool(index)}"
-    }
+    override val opName = s"invokevirtual ${cf.constant_pool(index)}"
 
     override def proc(ctx: ThreadCtx): Unit = ???
   }
@@ -118,9 +108,7 @@ object New {
 
   class OpNew(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
     val index: Short = reader.readShort()
-    override val opName = {
-      s"new ${cp(index)}"
-    }
+    override val opName = s"new ${cp(index)}"
 
     override def proc(ctx: ThreadCtx): Unit = ???
   }
@@ -141,9 +129,7 @@ object New {
       }
     }
 
-    override val opName = {
-      s"newarray ${ty}"
-    }
+    override val opName = s"newarray ${ty}"
 
     override def proc(ctx: ThreadCtx): Unit = ???
   }
@@ -151,9 +137,7 @@ object New {
   class OpANewArray(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
     val index: Short = reader.readShort()
 
-    override val opName = {
-      s"anewarray ${cp(index)}"
-    }
+    override val opName = s"anewarray ${cp(index)}"
 
     override def proc(ctx: ThreadCtx): Unit = ???
   }
@@ -167,16 +151,14 @@ class OpArrayLength(reader: StreamReader, val cf: ClassFile, val method: MethodI
 }
 
 class OpAThrow(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
-  override val opName = {
-    "athrow"
-  }
+  override val opName = "athrow"
 
   override def proc(ctx: ThreadCtx): Unit = ???
 }
 
 class OpCheck(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val index: Short = reader.readShort()
-  override val opName = {
+  override val opName: String = {
     val name = opCode match {
       case 0xC0 => "checkcast"
       case 0xC1 => "instanceof"
@@ -189,7 +171,7 @@ class OpCheck(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, v
 }
 
 class OpMonitor(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
-  override val opName = opCode match {
+  override val opName: String = opCode match {
     case 0xC2 => "monitorenter"
     case 0xC3 => "monitorexit"
   }

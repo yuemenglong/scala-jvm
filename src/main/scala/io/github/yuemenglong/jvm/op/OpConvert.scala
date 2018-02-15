@@ -4,8 +4,6 @@ import io.github.yuemenglong.jvm.common.{StreamReader, Types}
 import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
-import scala.reflect.{ClassTag, classTag}
-
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
@@ -24,8 +22,8 @@ class OpConvert(val reader: StreamReader,
                 val lineNo: Int,
                 val opCode: Int,
                ) extends Op {
-  val prefix = "ilfdi".charAt((opCode - 0x85) / 3)
-  val postfix = "lfdifdildilfbcs".charAt(opCode - 0x85)
+  val prefix: Char = "ilfdi".charAt((opCode - 0x85) / 3)
+  val postfix: Char = "lfdifdildilfbcs".charAt(opCode - 0x85)
   override val opName = s"${prefix}2${postfix}"
 
   override def proc(ctx: ThreadCtx): Unit = {
