@@ -24,9 +24,25 @@ object OpExt {
 }
 
 class OpWide(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
-  require(false)
+  val realCode: Int = (reader.readByte() + 256) % 256
+  val varnum: Short = reader.readShort()
+  var n: Short = _
 
-  override val opName = "wide"
+  val realName: String = realCode match {
+    case c if 0x15 <= c && c <= 0x19 => "ilfda".charAt(realCode - 0x15) + "load"
+    case c if 0x36 <= c && c <= 0x3A => "ilfda".charAt(realCode - 0x36) + "store"
+    case 0x84 =>
+      n = reader.readShort()
+      "iinc"
+    case 0xA9 => "ret"
+  }
+
+  override val opName = s"${realName}_w ${varnum} ${
+    realName match {
+      case "iinc" => n.toString
+      case _ => ""
+    }
+  }"
 
   override def proc(ctx: ThreadCtx): Unit = ???
 

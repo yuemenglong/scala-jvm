@@ -16,12 +16,12 @@ trait Op extends JvmItem {
 
   def proc(ctx: ThreadCtx)
 
-  override def toString = opName
+  override def toString: String = opName
 }
 
 object Op {
   def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, length: Int): Array[Op] = {
-    println(method.name)
+//    println(method.name)
     val rest = reader.length - length
     val ret = new ArrayBuffer[Op]()
     val max = reader.length
@@ -41,7 +41,7 @@ object Op {
         case c if 0xC4 <= c && c <= 0xC9 => OpExt.load(reader, cf, method, lineNo, code)
         case _ => new OpOther(reader, cf, method, lineNo, code, reader.readBytes(reader.length.toInt - rest.toInt))
       }
-      println(f"[${op.lineNo}] [${code}%02X] ${op}")
+//      println(f"[${op.lineNo}] [${code}%02X] ${op}")
       ret += op
     }
     ret.toArray
@@ -55,7 +55,7 @@ class OpOther(reader: StreamReader,
               val opCode: Int,
               val bytes: Array[Byte],
              ) extends Op {
-  override val opName = (Array(opCode.toByte) ++ bytes).map(b => f"${b}%02X").mkString("-")
+  override val opName: String = (Array(opCode.toByte) ++ bytes).map(b => f"${b}%02X").mkString("-")
 
   override def proc(ctx: ThreadCtx): Unit = {
     throw new RuntimeException(f"Op ${bytes(0)}%02X Not Implement")
