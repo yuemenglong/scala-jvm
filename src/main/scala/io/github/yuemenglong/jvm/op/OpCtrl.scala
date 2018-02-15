@@ -48,7 +48,7 @@ class OpRet(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val
 }
 
 class OpTableSwitch(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
-  val pad: Array[Byte] = reader.readBytes(lineNo % 4 - 3)
+  val pad: Array[Byte] = reader.readBytes(3 - lineNo % 4)
   val dft: Int = reader.readInt() + lineNo
   val low: Int = reader.readInt()
   val high: Int = reader.readInt()
@@ -59,7 +59,7 @@ class OpTableSwitch(reader: StreamReader, val cf: ClassFile, val method: MethodI
 }
 
 class OpLookupSwitch(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
-  val pad: Array[Byte] = reader.readBytes(lineNo % 4 - 3)
+  val pad: Array[Byte] = reader.readBytes(3 - lineNo % 4)
   val dft: Int = reader.readInt() + lineNo
   val npairs: Int = reader.readInt()
   val offset_pairs: Array[(Int, Int)] = (1 to npairs).map(_ => (reader.readInt(), reader.readInt() + lineNo)).toArray
