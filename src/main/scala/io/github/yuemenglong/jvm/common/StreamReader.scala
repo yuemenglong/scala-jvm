@@ -1,27 +1,33 @@
 package io.github.yuemenglong.jvm.common
 
+import java.io.{BufferedInputStream, InputStream}
 import java.nio.ByteBuffer
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/8.
   */
-class StreamReader(seq: Seq[Byte]) {
-  var s = seq
+class StreamReader(is: InputStream) {
+  val buffer = new BufferedInputStream(is)
+  private var pos0 = 0
+  //  var s = seq
 
   private def readT[T](len: Int, fn: ByteBuffer => T): T = {
     val wrap = ByteBuffer.wrap(readBytes(len))
     fn(wrap)
   }
 
+  def pos: Int = pos0
+
   def readBytes(len: Int): Array[Byte] = {
-    val arr = s.slice(0, len).toArray
-    s = s.drop(len)
-    arr
+    val ret = new Array[Byte](len)
+    val l = buffer.read(ret)
+    require(l == len)
+    pos0 += l
+    ret
+    //    val arr = s.slice(0, len).toArray
+    //    s = s.drop(len)
+    //    arr
   }
-
-  def length: Long = s.length
-
-  def isEmpty: Boolean = s.isEmpty
 
   def readByte(): Byte = readT(1, _.get())
 

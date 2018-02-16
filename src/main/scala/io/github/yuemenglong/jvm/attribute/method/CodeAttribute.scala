@@ -28,10 +28,12 @@ class CodeAttribute(reader: StreamReader,
     AttributeInfo.load(reader, cf)
   }).toArray
 
+  def stackMapTable = ???
+
+  def lineNumberTable = ???
+
   override def toString: String = {
-    s"${name} ${code.length}\n" +
-      attributes.map(_.toString).mkString("\n") + "\n" +
-      code.zipWithIndex.map(p => s"[${p._2}] ${p._1}").mkString("\n")
+    code.zipWithIndex.map(p => s"[${p._2}] ${p._1}").mkString("\n")
   }
 }
 

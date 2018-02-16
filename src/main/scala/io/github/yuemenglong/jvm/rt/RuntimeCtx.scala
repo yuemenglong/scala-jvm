@@ -52,7 +52,6 @@ class RuntimeCtx {
         }
       }).takeWhile(_ != null).foreach(je => {
         if (!je.isDirectory && je.getName.endsWith(".class")) {
-          println(s"[Jar] ${je.getName}")
           load(jf.getInputStream(je))
         }
       })
@@ -60,7 +59,7 @@ class RuntimeCtx {
   }
 
   def load(is: InputStream): Unit = {
-    val reader = new StreamReader(read(is))
+    val reader = new StreamReader(is)
     val cf = new ClassFile(reader)
     clazzMap += (cf.name -> cf)
     println(s"[Load] ${cf.name}")

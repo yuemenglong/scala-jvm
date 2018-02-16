@@ -21,12 +21,12 @@ trait Op extends JvmItem {
 
 object Op {
   def load(reader: StreamReader, cf: ClassFile, method: MethodInfo, length: Int): Array[Op] = {
-//    println(method.name)
-    val rest = reader.length - length
+    //    println(method.name)
+    val startPos = reader.pos
+    val endPos = reader.pos + length
     val ret = new ArrayBuffer[Op]()
-    val max = reader.length
-    while (reader.length > rest) {
-      val lineNo = (max - reader.length).toInt
+    while (reader.pos < endPos) {
+      val lineNo = reader.pos - startPos
       val code = (reader.readByte() + 256) % 256
       val op = code match {
         case c if 0x00 <= c && c <= 0x14 => OpConst.load(reader, cf, method, lineNo, code)
@@ -39,9 +39,9 @@ object Op {
         case c if 0xA7 <= c && c <= 0xB1 => OpCtrl.load(reader, cf, method, lineNo, code)
         case c if 0xB2 <= c && c <= 0xC3 => OpRef.load(reader, cf, method, lineNo, code)
         case c if 0xC4 <= c && c <= 0xC9 => OpExt.load(reader, cf, method, lineNo, code)
-        case _ => new OpOther(reader, cf, method, lineNo, code, reader.readBytes(reader.length.toInt - rest.toInt))
+        case _ => new OpOther(reader, cf, method, lineNo, code, reader.readBytes(endPos - reader.pos))
       }
-//      println(f"[${op.lineNo}] [${code}%02X] ${op}")
+      //      println(f"[${op.lineNo}] [${code}%02X] ${op}")
       ret += op
     }
     ret.toArray

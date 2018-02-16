@@ -38,13 +38,17 @@ class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with A
     }
   }
 
-  def code: CodeAttribute = attributes.find(_.isInstanceOf[CodeAttribute]).get.asInstanceOf[CodeAttribute]
+  def code: CodeAttribute = attributes.find(_.isInstanceOf[CodeAttribute]).orNull.asInstanceOf[CodeAttribute]
 
   def signatures: Array[SignatureAttribute] = attributes.filter(_.isInstanceOf[SignatureAttribute]).map(_.asInstanceOf[SignatureAttribute])
 
   override def toString: String = {
-    s"[Method] ${accessFlagsValue.mkString(",")} ${descriptor} ${name} ${signatures.map(_.toString).mkString(",")}\n" +
-      s"${attributes.map(_.toString).mkString("\n")}"
+    val fn = s"${signatures.map(_.toString).mkString(",")} ${accessFlagsValue.mkString(",")} ${descriptor} ${name}"
+    val c = code match {
+      case null => ""
+      case _ => s"\n${code}"
+    }
+    s"[Method] ${fn}${c}"
   }
 
   override def accessMaskMap = Map(
