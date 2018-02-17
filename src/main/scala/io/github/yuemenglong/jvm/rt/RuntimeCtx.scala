@@ -1,13 +1,13 @@
 package io.github.yuemenglong.jvm.rt
 
 import java.io.{File, FileInputStream}
+import java.nio.file.Paths
 
 import io.github.yuemenglong.jvm.common.StreamReader
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.tools.nsc.interpreter.InputStream
-import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
 /**
@@ -16,34 +16,13 @@ import java.util.jar.JarFile
 
 class RuntimeCtx {
   var heap: Any = _
+  var clazzLoaderMap: Map[String, InputStream] = Map()
   var clazzMap: Map[String, ClassFile] = Map()
   var threads: ArrayBuffer[ThreadCtx] = new ArrayBuffer[ThreadCtx]()
 
-  private def read(is: InputStream): Seq[Byte] = {
-    val buffer = new Array[Byte](4096)
-    Stream.continually({
-      val len = is.read(buffer)
-      len match {
-        case -1 => null
-        case _ => buffer.take(len)
-      }
-    }).takeWhile(_ != null).flatten
-  }
-
-  def createThread(method: MethodInfo): ThreadCtx = {
-    threads += new ThreadCtx(method, this)
-    threads.last
-  }
-
-  def load(path: String): Unit = load(new File(path))
-
-  def load(file: File): Unit = {
-    if (file.isDirectory) {
-      file.listFiles().foreach(load)
-    } else if (file.getName.endsWith(".class")) {
-      load(new FileInputStream(file))
-    } else if (file.getName.endsWith(".jar")) {
-      val jf = new JarFile(file)
+  def clazzpath(root: String): Unit = {
+    if (root.endsWith(".jar")) {
+      val jf = new JarFile(root)
       val es = jf.entries()
       Stream.continually({
         es.hasMoreElements match {
@@ -52,17 +31,45 @@ class RuntimeCtx {
         }
       }).takeWhile(_ != null).foreach(je => {
         if (!je.isDirectory && je.getName.endsWith(".class")) {
-          load(jf.getInputStream(je))
+          clazzLoaderMap += (je.getName.replace(".class", "") -> jf.getInputStream(je))
         }
       })
+    } else {
+      val rootAbs = Paths.get(root).toAbsolutePath
+
+      def go(file: File): Unit = {
+        if (file.isDirectory) {
+          file.listFiles().foreach(go)
+        } else if (file.getName.endsWith(".class")) {
+          val rel = rootAbs.relativize(Paths.get(file.getAbsolutePath)).toString.replaceAll("\\\\", "/")
+          clazzLoaderMap += (rel.replace(".class", "") -> new FileInputStream(file))
+        }
+      }
+
+      go(new File(root))
     }
   }
 
-  def load(is: InputStream): Unit = {
+  def createThread(method: MethodInfo): ThreadCtx = {
+    threads += new ThreadCtx(method, this)
+    threads.last
+  }
+
+  def load(path: String): ClassFile = {
+    if (clazzMap.contains(path)) {
+      clazzMap(path)
+    } else if (clazzLoaderMap.contains(path)) {
+      load(clazzLoaderMap(path))
+    } else
+      throw new RuntimeException(s"Unknown Class [${path}]")
+  }
+
+  def load(is: InputStream): ClassFile = {
     val reader = new StreamReader(is)
     val cf = new ClassFile(reader)
     clazzMap += (cf.name -> cf)
     println(s"[Load] ${cf.name}")
+    cf
   }
 }
 
