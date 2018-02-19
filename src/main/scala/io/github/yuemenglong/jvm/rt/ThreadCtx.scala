@@ -51,10 +51,18 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
 
   override def toString = {
     val p = s"\t[Pc] ${pc}"
-    val l = frame.localVariable.toArray.sortBy(_._1).map { case (idx, value) =>
-      s"\t[Local] [${idx}] ${value}"
-    }.mkString("\n")
-    val s = stack.map(v => s"\t[Stack] ${v}").mkString("\n")
+    val l = frame.localVariable match {
+      case v if v.nonEmpty => v.toArray.sortBy(_._1)
+        .map { case (idx, value) =>
+          s"\t[Local] [${idx}] ${value}"
+        }.mkString("\n")
+      case _ => "\t[Local-None]"
+    }
+
+    val s = stack.nonEmpty match {
+      case true => stack.map(v => s"\t[Stack] ${v}").mkString("\n")
+      case false => "\t[Stack-None]"
+    }
     s"${p}\n${l}\n${s}"
   }
 }

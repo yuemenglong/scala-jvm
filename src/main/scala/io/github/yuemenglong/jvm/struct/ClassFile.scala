@@ -3,7 +3,8 @@ package io.github.yuemenglong.jvm.struct
 import io.github.yuemenglong.jvm.common.{AccessFlagName, JvmItem, StreamReader}
 
 class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
-  val cf = this
+  val cf: ClassFile = this
+
   val magic: Int = reader.readInt()
   require(magic == 0xCAFEBABE)
   val minor_version: Short = reader.readShort()
@@ -43,7 +44,8 @@ class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
 
   def todo(): String = {
     attributes.mkString("\n") + "\n" +
-      methods.map(_.todo).mkString("\n")
+      methods.map(_.todo).mkString("\n") + "\n" +
+      fields.map(_.todo).mkString("\n")
   }
 
   def name: String = cp(this_class).asInstanceOf[ConstantClassInfo].name
@@ -55,12 +57,27 @@ class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
     }
   }
 
+  def main(): MethodInfo = {
+    method("main")(0)
+  }
+
   def method(name: String): Array[MethodInfo] = {
     methods.filter(m => m.name == name)
   }
 
   def method(name: String, descriptor: String): MethodInfo = {
     methods.find(m => m.name == name && m.descriptor == descriptor) match {
+      case Some(m) => m
+      case None => null
+    }
+  }
+
+  def field(name: String): Array[FieldInfo] = {
+    fields.filter(m => m.name == name)
+  }
+
+  def field(name: String, descriptor: String): FieldInfo = {
+    fields.find(m => m.name == name && m.descriptor == descriptor) match {
       case Some(m) => m
       case None => null
     }

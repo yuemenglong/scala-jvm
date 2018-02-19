@@ -80,35 +80,48 @@ trait CpInfo extends JvmItem {
 }
 
 trait ValuedCpInfo extends CpInfo {
-  val value: Any
+  def value: Any
 
-  override def debug = value.toString
+  override def debug: String = value.toString
 }
 
 class ConstantUtf8Info(reader: StreamReader, override val cf: ClassFile) extends ValuedCpInfo {
   override val tag = 1
   val length: Short = reader.readShort()
-  val value: String = reader.readString(length)
+  val bytes: String = reader.readString(length)
+
+  def value: Any = bytes
 }
 
 class ConstantIntegerInfo(reader: StreamReader, override val cf: ClassFile) extends ValuedCpInfo {
   override val tag = 3
-  val value: Int = reader.readInt()
+  val bytes: Int = reader.readInt()
+
+  def value: Any = bytes
 }
 
 class ConstantFloatInfo(reader: StreamReader, override val cf: ClassFile) extends ValuedCpInfo {
   override val tag = 4
-  val value: Float = reader.readFloat()
+
+  val bytes: Float = reader.readFloat()
+
+  def value: Any = bytes
 }
 
 class ConstantLongInfo(reader: StreamReader, override val cf: ClassFile) extends ValuedCpInfo {
   override val tag = 5
-  val value = reader.readLong()
+
+  val bytes: Long = reader.readLong()
+
+  def value: Any = bytes
 }
 
 class ConstantDoubleInfo(reader: StreamReader, override val cf: ClassFile) extends ValuedCpInfo {
   override val tag = 6
-  val value = reader.readDouble()
+
+  val bytes: Double = reader.readDouble()
+
+  def value: Any = bytes
 }
 
 class ConstantClassInfo(reader: StreamReader, override val cf: ClassFile) extends CpInfo {
@@ -117,16 +130,16 @@ class ConstantClassInfo(reader: StreamReader, override val cf: ClassFile) extend
 
   def name: String = cpv(name_index).value.toString
 
-  override def debug = name
+  override def debug: String = name
 }
 
-class ConstantStringInfo(reader: StreamReader, override val cf: ClassFile) extends CpInfo {
+class ConstantStringInfo(reader: StreamReader, override val cf: ClassFile) extends ValuedCpInfo {
   override val tag = 8
   val string_index: Short = reader.readShort()
 
-  def value: String = cpv(string_index).value.toString
+  def value: Any = cpv(string_index).value.toString
 
-  override def debug = value
+  override def debug: String = value.toString
 }
 
 class ConstantFieldrefInfo(reader: StreamReader, override val cf: ClassFile) extends CpInfo {
@@ -134,11 +147,11 @@ class ConstantFieldrefInfo(reader: StreamReader, override val cf: ClassFile) ext
   val class_index: Short = reader.readShort()
   val name_and_type_index: Short = reader.readShort()
 
-  def clazz: String = cpv(class_index).value.toString
+  def clazz: String = cpc(class_index).name.toString
 
-  def name = cp(name_and_type_index).asInstanceOf[ConstantNameAndTypeInfo].name
+  def name: String = cp(name_and_type_index).asInstanceOf[ConstantNameAndTypeInfo].name
 
-  def descriptor = cp(name_and_type_index).asInstanceOf[ConstantNameAndTypeInfo].descriptor
+  def descriptor: String = cp(name_and_type_index).asInstanceOf[ConstantNameAndTypeInfo].descriptor
 
   override def debug = s"${clazz} ${descriptor} ${name}"
 }
@@ -189,14 +202,14 @@ class ConstantMethodHandleInfo(reader: StreamReader, override val cf: ClassFile)
   val reference_kind: Byte = reader.readByte()
   val reference_index: Short = reader.readShort()
 
-  override def debug = reference_kind + " | " + cp(reference_index)
+  override def debug: String = reference_kind + " | " + cp(reference_index)
 }
 
 class ConstantMethodTypeInfo(reader: StreamReader, override val cf: ClassFile) extends CpInfo {
   override val tag = 16
   val descriptor_index: Short = reader.readShort()
 
-  override def debug = cp(descriptor_index).toString
+  override def debug: String = cp(descriptor_index).toString
 }
 
 class ConstantInvokeDynamicInfo(reader: StreamReader, override val cf: ClassFile) extends CpInfo {
@@ -204,5 +217,5 @@ class ConstantInvokeDynamicInfo(reader: StreamReader, override val cf: ClassFile
   val bootstrap_method_attr_index: Short = reader.readShort()
   val name_and_type_index: Short = reader.readShort()
 
-  override def debug = cp(bootstrap_method_attr_index) + " | " + cp(name_and_type_index)
+  override def debug: String = cp(bootstrap_method_attr_index) + " | " + cp(name_and_type_index)
 }

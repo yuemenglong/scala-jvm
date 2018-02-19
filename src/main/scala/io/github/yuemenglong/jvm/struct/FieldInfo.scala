@@ -14,13 +14,16 @@ class FieldInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with Ac
     AttributeInfo.load(reader, cf)
   }).toArray
 
-  def name: String = cp(name_index).toString
+  def name: String = cpv(name_index).value.toString
 
-  def descriptor: String = cp(descriptor_index).toString
+  def descriptor: String = cpv(descriptor_index).value.toString
 
   override def toString = {
-    s"[Field] ${accessFlagsValue} ${descriptor} ${name}\n" +
-      attributes.mkString("\n")
+    s"[Field] ${accessFlagsValue.mkString(",")} ${descriptor} ${name}"
+  }
+
+  def todo = {
+    attributes.mkString("\n")
   }
 
   override def accessMaskMap: Map[Int, String] = Map(

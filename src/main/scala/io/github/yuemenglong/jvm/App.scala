@@ -6,8 +6,9 @@ object App {
   def main(args: Array[String]): Unit = {
     Vm.rt.clazzpath("target/test-classes")
     Vm.rt.clazzpath("C:/Program Files/Java/jdk1.8.0_131/jre/lib/rt.jar")
-    val a = Vm.rt.load("io/github/yuemenglong/jvm/Java")
-    println(a.todo())
+    val lib = Vm.rt.load("io/github/yuemenglong/jvm/Java")
+    Vm.run(lib.main())
+    //    println(lib)
   }
 }
 

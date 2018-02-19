@@ -38,9 +38,16 @@ class OpStatic(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, 
     case 1 => "field"
   }
 
-  override val opName = s"${prefix}${postfix}"
+  override val opName = s"${prefix}${postfix} ${cp(index)}"
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    s"${prefix}${postfix}" match {
+      case "getstatic" =>
+        val field = ctx.rt.load(cpf(index).clazz).field(cpf(index).name, cpf(index).descriptor)
+        ctx.push(field)
+      case _ => require(false)
+    }
+  }
 }
 
 object Invoke {

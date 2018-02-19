@@ -1,6 +1,6 @@
 package io.github.yuemenglong.jvm.common
 
-import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantClassInfo, CpInfo, ValuedCpInfo}
+import io.github.yuemenglong.jvm.struct._
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/11.
@@ -22,7 +22,9 @@ trait JvmItem {
     cf.constant_pool(i)
   }
 
-  def cpv(idx: Any) = cp(idx).asInstanceOf[ValuedCpInfo]
+  def cpv(idx: Any): ValuedCpInfo = cp(idx).asInstanceOf[ValuedCpInfo]
 
-  def cpc(idx: Any) = cp(idx).asInstanceOf[ConstantClassInfo]
+  def cpc(idx: Any): ConstantClassInfo = cp(idx).asInstanceOf[ConstantClassInfo]
+
+  def cpf(idx: Any): ConstantFieldrefInfo = cp(idx).asInstanceOf[ConstantFieldrefInfo]
 }
