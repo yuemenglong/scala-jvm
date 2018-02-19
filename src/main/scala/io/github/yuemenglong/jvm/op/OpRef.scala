@@ -79,7 +79,7 @@ object Invoke {
 
     override def proc(ctx: ThreadCtx): Unit = {
       val ref = cp(index).asInstanceOf[ConstantMethodrefInfo]
-      val method = ctx.rt.clazzMap(ref.clazz).method(ref.name, ref.descriptor)
+      val method = ctx.rt.load(ref.clazz).method(ref.name, ref.descriptor)
       var idx = 0
       var map = Map[Int, Any]()
       method.paramsType.foreach(_ => {

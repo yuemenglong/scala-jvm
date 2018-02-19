@@ -15,10 +15,10 @@ import java.util.jar.JarFile
   */
 
 class RuntimeCtx {
-  var heap: Any = _
-  var clazzLoaderMap: Map[String, InputStream] = Map()
-  var clazzMap: Map[String, ClassFile] = Map()
-  var threads: ArrayBuffer[ThreadCtx] = new ArrayBuffer[ThreadCtx]()
+  private var heap: Any = _
+  private var clazzLoaderMap: Map[String, InputStream] = Map()
+  private var clazzMap: Map[String, ClassFile] = Map()
+  private var threads: ArrayBuffer[ThreadCtx] = new ArrayBuffer[ThreadCtx]()
 
   def clazzpath(root: String): Unit = {
     if (root.endsWith(".jar")) {
@@ -51,6 +51,9 @@ class RuntimeCtx {
   }
 
   def createThread(method: MethodInfo): ThreadCtx = {
+    if (!clazzMap.contains(method.cf.name)) {
+      clazzMap += (method.cf.name -> method.cf)
+    }
     threads += new ThreadCtx(method, this)
     threads.last
   }

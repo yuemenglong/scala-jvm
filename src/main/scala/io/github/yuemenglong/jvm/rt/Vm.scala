@@ -22,12 +22,6 @@ object Vm {
   }
 
   def run(method: MethodInfo): Any = {
-    rt.clazzMap += (method.cf.name -> method.cf)
     run(rt.createThread(method))
-  }
-
-  def run(): Any = {
-    val method = rt.clazzMap.find(_._2.method("main").length > 0).get._2.method("main")(0)
-    run(method)
   }
 }
