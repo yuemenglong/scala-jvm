@@ -41,6 +41,11 @@ class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
     ).mkString("\n")
   }
 
+  def todo(): String = {
+    attributes.mkString("\n") + "\n" +
+      methods.map(_.todo).mkString("\n")
+  }
+
   def name: String = cp(this_class).asInstanceOf[ConstantClassInfo].name
 
   def parent: String = {

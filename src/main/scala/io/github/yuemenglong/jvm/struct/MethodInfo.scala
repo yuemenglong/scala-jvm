@@ -51,6 +51,12 @@ class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with A
     s"[Method] ${fn}${c}"
   }
 
+  def todo: String = {
+    attributes.filter(a => !(a.isInstanceOf[CodeAttribute] || a.isInstanceOf[SignatureAttribute]))
+      .mkString("\n") + "\n" +
+      code.todo
+  }
+
   override def accessMaskMap = Map(
     0x0001 -> "ACC_PUBLIC",
     0x0002 -> "ACC_PRIVATE",
