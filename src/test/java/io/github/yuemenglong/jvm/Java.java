@@ -5,12 +5,8 @@ package io.github.yuemenglong.jvm;
 
 public class Java {
 
-    private void f() {
-
-    }
+    public static Java j = new Java();
 
     public static void main(String args[]) {
-        Java j = new Java();
-        j.f();
     }
 }

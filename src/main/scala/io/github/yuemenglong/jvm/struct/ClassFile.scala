@@ -33,7 +33,7 @@ class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
 
   override def toString: String = {
     Array(
-      s"${accessFlagsValue.mkString(",")} [${name}] Extends [${sup}] Implements [${implements.mkString(",")}]",
+      s"${accessFlags.mkString(",")} [${name}] Extends [${sup}] Implements [${implements.mkString(",")}]",
       s"[Interface] ${implements.mkString(",")}",
       methods.mkString("\n"),
       fields.mkString("\n"),
@@ -60,10 +60,17 @@ class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
   }
 
   def main(): MethodInfo = {
-    method("main")(0)
+    method("main")
   }
 
-  def method(name: String): Array[MethodInfo] = {
+  def method(name: String): MethodInfo = {
+    methods(name) match {
+      case arr if arr.length > 0 => arr(0)
+      case _ => null
+    }
+  }
+
+  def methods(name: String): Array[MethodInfo] = {
     methods.filter(m => m.name == name)
   }
 

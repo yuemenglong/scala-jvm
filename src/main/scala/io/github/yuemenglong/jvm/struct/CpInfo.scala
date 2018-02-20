@@ -1,6 +1,6 @@
 package io.github.yuemenglong.jvm.struct
 
-import io.github.yuemenglong.jvm.common.{JvmItem, StreamReader}
+import io.github.yuemenglong.jvm.common.{JvmItem, Kit, StreamReader}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -48,7 +48,7 @@ object CpInfo {
         f"[${i}%02d] [${info.cpType}] [${info.debug}]"
       }
     }.mkString("\n")
-    println(str)
+    Kit.debug(str)
   }
 }
 

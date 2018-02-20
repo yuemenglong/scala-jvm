@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
-import io.github.yuemenglong.jvm.rt.ThreadCtx
+import io.github.yuemenglong.jvm.rt.{ThreadCtx, Vm}
 import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantClassInfo, ConstantMethodrefInfo, MethodInfo}
 
 /**
@@ -43,9 +43,14 @@ class OpStatic(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, 
   override def proc(ctx: ThreadCtx): Unit = {
     s"${prefix}${postfix}" match {
       case "getstatic" =>
-        val field = ctx.rt.load(cpf(index).clazz).field(cpf(index).name, cpf(index).descriptor)
+        val info = ctx.rt.load(cpf(index).clazz).field(cpf(index).name, cpf(index).descriptor)
+        val field = ctx.rt.getStatic(info.cf, info.name)
         ctx.push(field)
-      case _ => require(false)
+      case "putstatic" =>
+        val info = ctx.rt.load(cpf(index).clazz).field(cpf(index).name, cpf(index).descriptor)
+        val field = ctx.pop()
+        ctx.rt.putStatic(info.cf, info.name, field)
+      case _ => ???
     }
   }
 }
@@ -81,19 +86,10 @@ object Invoke {
       val info = cp(index)
       info match {
         case mr: ConstantMethodrefInfo =>
-          var cur = ctx.rt.load(mr.clazz)
-          Stream.continually({
-            val ret = cur.method(mr.name, mr.descriptor)
-            if (ret == null) {
-              cur = ctx.rt.superClazz(cur)
-            }
-            ret
-          }).find(_ != null) match {
-            case Some(m) =>
-              val map = Kit.makeVariableTable(ctx, m.paramsType.length + 1) // TODO
-              ctx.call(m, map)
-            case None => ???
-          }
+          val cur = ctx.rt.load(mr.clazz)
+          val m = Kit.findMethod(cur, mr.name, mr.descriptor)
+          val map = Kit.makeVariableTable(ctx, m.paramsType.length + 1) // TODO interface
+          ctx.call(m, map)
         case _ => ???
       }
     }
@@ -106,8 +102,13 @@ object Invoke {
     override def proc(ctx: ThreadCtx): Unit = {
       val ref = cp(index).asInstanceOf[ConstantMethodrefInfo]
       val method = ctx.rt.load(ref.clazz).method(ref.name, ref.descriptor)
-      val map = Kit.makeVariableTable(ctx, method.paramsType.length)
-      ctx.call(method, map)
+      if (method.accessFlags.contains("ACC_NATIVE")) {
+        val m = Vm.staticNatives(method.cf.name, method.name, method.descriptor)
+        m()
+      } else {
+        val map = Kit.makeVariableTable(ctx, method.paramsType.length)
+        ctx.call(method, map)
+      }
     }
   }
 
@@ -117,7 +118,6 @@ object Invoke {
 
     override def proc(ctx: ThreadCtx): Unit = {
       val info = cp(index).asInstanceOf[ConstantMethodrefInfo]
-      val m = ctx.rt.load(info.clazz).method(info.name, info.descriptor)
       ???
     }
   }

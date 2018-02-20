@@ -43,7 +43,7 @@ class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with A
   def signatures: Array[SignatureAttribute] = attributes.filter(_.isInstanceOf[SignatureAttribute]).map(_.asInstanceOf[SignatureAttribute])
 
   override def toString: String = {
-    val fn = s"${signatures.map(_.toString).mkString(",")} ${accessFlagsValue.mkString(",")} ${descriptor} ${name}"
+    val fn = s"${signatures.map(_.toString).mkString(",")} ${accessFlags.mkString(",")} ${descriptor} ${name}"
     val c = code match {
       case null => ""
       case _ => s"\n${code}"

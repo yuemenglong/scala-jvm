@@ -8,9 +8,7 @@ object App {
     Vm.rt.clazzpath("C:/Program Files/Java/jdk1.8.0_131/jre/lib/rt.jar")
     val lib = Vm.rt.load("io/github/yuemenglong/jvm/Java")
     Vm.run(lib.main())
-//    val o = Vm.rt.load("java/lang/Object")
-//    println(o)
-    //    println(lib)
+//    println(lib)
   }
 }
 

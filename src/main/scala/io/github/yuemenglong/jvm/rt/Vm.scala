@@ -1,5 +1,6 @@
 package io.github.yuemenglong.jvm.rt
 
+import io.github.yuemenglong.jvm.common.Kit
 import io.github.yuemenglong.jvm.struct.MethodInfo
 
 /**
@@ -7,18 +8,24 @@ import io.github.yuemenglong.jvm.struct.MethodInfo
   */
 object Vm {
 
+  val staticNatives: Map[(String, String, String), () => Unit] = Map(
+    ("java/lang/Object", "registerNatives", "()V") -> (() => {
+
+    }),
+  )
   val rt: RuntimeCtx = new RuntimeCtx
 
   def run(ctx: ThreadCtx): Any = {
     def isFinish: Boolean = ctx.frames.isEmpty
 
     while (!isFinish) {
-      println(ctx)
+      Kit.debug(ctx)
       val code = ctx.code()
-      println(f"[${code.cf.simpleName}:${code.method.name}] [${code.lineNo}] ${code}")
+      Kit.debug(f"[${code.cf.simpleName}:${code.method.name}] [${code.lineNo}] ${code}")
       ctx.inc()
       code.proc(ctx)
     }
+    rt.finishThread(ctx)
   }
 
   def run(method: MethodInfo): Any = {

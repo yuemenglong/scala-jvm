@@ -11,7 +11,7 @@ trait AccessFlagName {
 
   private def matche(mask: Int): Boolean = (access_flags & mask) > 0
 
-  def accessFlagsValue: Array[String] = {
+  def accessFlags: Array[String] = {
     accessMaskMap.toArray.map { case (mask, ret) =>
       matche(mask) match {
         case true => ret

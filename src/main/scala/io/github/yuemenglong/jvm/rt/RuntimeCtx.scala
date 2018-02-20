@@ -3,7 +3,7 @@ package io.github.yuemenglong.jvm.rt
 import java.io.{File, FileInputStream}
 import java.nio.file.Paths
 
-import io.github.yuemenglong.jvm.common.StreamReader
+import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.collection.mutable.ArrayBuffer
@@ -18,7 +18,8 @@ class RuntimeCtx {
   private var counter: Long = 0
   private var heap: Map[Long, Obj] = Map()
   private var clazzLoaderMap: Map[String, InputStream] = Map()
-  private var clazzMap: Map[String, ClassFile] = Map()
+  private var clazzMetaMap: Map[String, ClassFile] = Map()
+  private var classMap: Map[String, RtClazz] = Map()
   private var threads: ArrayBuffer[ThreadCtx] = new ArrayBuffer[ThreadCtx]()
 
   def clazzpath(root: String): Unit = {
@@ -59,11 +60,17 @@ class RuntimeCtx {
   }
 
   def createThread(method: MethodInfo): ThreadCtx = {
-    if (!clazzMap.contains(method.cf.name)) {
-      clazzMap += (method.cf.name -> method.cf)
+    if (!clazzMetaMap.contains(method.cf.name)) {
+      clazzMetaMap += (method.cf.name -> method.cf)
     }
     threads += new ThreadCtx(method, this)
+    Kit.debug("[CreateThread]")
     threads.last
+  }
+
+  def finishThread(t: ThreadCtx): Unit = {
+    Kit.debug("[FinishThread]")
+    threads -= t
   }
 
   def superClazz(cf: ClassFile): ClassFile = {
@@ -74,8 +81,8 @@ class RuntimeCtx {
   }
 
   def load(path: String): ClassFile = {
-    if (clazzMap.contains(path)) {
-      clazzMap(path)
+    if (clazzMetaMap.contains(path)) {
+      clazzMetaMap(path)
     } else if (clazzLoaderMap.contains(path)) {
       load(clazzLoaderMap(path))
     } else
@@ -85,11 +92,24 @@ class RuntimeCtx {
   def load(is: InputStream): ClassFile = {
     val reader = new StreamReader(is)
     val cf = new ClassFile(reader)
-    clazzMap += (cf.name -> cf)
-    println(s"[Load] ${cf.name}")
+    Kit.debug(s"[Load] ${cf.name}")
+    classMap += (cf.name -> new RtClazz(cf))
+    clazzMetaMap += (cf.name -> cf)
+    val clinit = cf.method("<clinit>")
+    if (clinit != null) {
+      Vm.run(clinit)
+    }
+    Kit.debug(s"[Load] ${cf.name} SUCC")
     cf
   }
+
+  def getStatic(cf: ClassFile, key: String): Any = classMap(cf.name).getStatic(key)
+
+  def putStatic(cf: ClassFile, key: String, value: Any): Unit = classMap(cf.name).putStatic(key, value)
+
 }
+
+
 
 
 
