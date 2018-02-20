@@ -60,7 +60,10 @@ class OpDup(val reader: StreamReader,
     }
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val idx = opCode - 0x59
+    ctx.push(ctx.peek(idx))
+  }
 }
 
 class OpDup2(val reader: StreamReader,

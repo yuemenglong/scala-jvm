@@ -1,6 +1,6 @@
 package io.github.yuemenglong.jvm.op
 
-import io.github.yuemenglong.jvm.common.StreamReader
+import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
 import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantClassInfo, ConstantMethodrefInfo, MethodInfo}
 
@@ -77,7 +77,26 @@ object Invoke {
     val index: Short = reader.readShort()
     override val opName = s"invokespecial ${cf.constant_pool(index)}"
 
-    override def proc(ctx: ThreadCtx): Unit = ???
+    override def proc(ctx: ThreadCtx): Unit = {
+      val info = cp(index)
+      info match {
+        case mr: ConstantMethodrefInfo =>
+          var cur = ctx.rt.load(mr.clazz)
+          Stream.continually({
+            val ret = cur.method(mr.name, mr.descriptor)
+            if (ret == null) {
+              cur = ctx.rt.superClazz(cur)
+            }
+            ret
+          }).find(_ != null) match {
+            case Some(m) =>
+              val map = Kit.makeVariableTable(ctx, m.paramsType.length + 1) // TODO
+              ctx.call(m, map)
+            case None => ???
+          }
+        case _ => ???
+      }
+    }
   }
 
   class OpInvokeStatic(val reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
@@ -87,17 +106,7 @@ object Invoke {
     override def proc(ctx: ThreadCtx): Unit = {
       val ref = cp(index).asInstanceOf[ConstantMethodrefInfo]
       val method = ctx.rt.load(ref.clazz).method(ref.name, ref.descriptor)
-      var idx = 0
-      var map = Map[Int, Any]()
-      method.paramsType.foreach(_ => {
-        val p = ctx.pop()
-        map += (idx -> p)
-        idx += 1
-        if (p.isInstanceOf[Double] || p.isInstanceOf[Long]) {
-          //        map += (idx -> p)
-          idx += 1
-        }
-      })
+      val map = Kit.makeVariableTable(ctx, method.paramsType.length)
       ctx.call(method, map)
     }
   }
@@ -106,7 +115,11 @@ object Invoke {
     val index: Short = reader.readShort()
     override val opName = s"invokevirtual ${cf.constant_pool(index)}"
 
-    override def proc(ctx: ThreadCtx): Unit = ???
+    override def proc(ctx: ThreadCtx): Unit = {
+      val info = cp(index).asInstanceOf[ConstantMethodrefInfo]
+      val m = ctx.rt.load(info.clazz).method(info.name, info.descriptor)
+      ???
+    }
   }
 
 }
@@ -117,7 +130,11 @@ object New {
     val index: Short = reader.readShort()
     override val opName = s"new ${cp(index)}"
 
-    override def proc(ctx: ThreadCtx): Unit = ???
+    override def proc(ctx: ThreadCtx): Unit = {
+      val cf = ctx.rt.load(cpc(index).name)
+      val obj = ctx.rt.createObject(cf)
+      ctx.push(obj)
+    }
   }
 
   class OpNewArray(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {

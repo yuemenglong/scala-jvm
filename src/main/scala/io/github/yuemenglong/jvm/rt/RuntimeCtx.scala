@@ -15,7 +15,8 @@ import java.util.jar.JarFile
   */
 
 class RuntimeCtx {
-  private var heap: Any = _
+  private var counter: Long = 0
+  private var heap: Map[Long, Obj] = Map()
   private var clazzLoaderMap: Map[String, InputStream] = Map()
   private var clazzMap: Map[String, ClassFile] = Map()
   private var threads: ArrayBuffer[ThreadCtx] = new ArrayBuffer[ThreadCtx]()
@@ -50,12 +51,26 @@ class RuntimeCtx {
     }
   }
 
+  def createObject(cf: ClassFile): Obj = {
+    counter += 1
+    val obj = new Obj(cf, counter)
+    heap += (obj.id -> obj)
+    obj
+  }
+
   def createThread(method: MethodInfo): ThreadCtx = {
     if (!clazzMap.contains(method.cf.name)) {
       clazzMap += (method.cf.name -> method.cf)
     }
     threads += new ThreadCtx(method, this)
     threads.last
+  }
+
+  def superClazz(cf: ClassFile): ClassFile = {
+    cf.sup match {
+      case null => null
+      case _ => load(cf.sup)
+    }
   }
 
   def load(path: String): ClassFile = {

@@ -4,9 +4,13 @@
 package io.github.yuemenglong.jvm;
 
 public class Java {
-    private int i = 0;
+
+    private void f() {
+
+    }
 
     public static void main(String args[]) {
-        System.out.print("hello world");
+        Java j = new Java();
+        j.f();
     }
 }

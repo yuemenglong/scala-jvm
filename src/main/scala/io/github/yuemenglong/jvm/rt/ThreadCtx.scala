@@ -26,6 +26,10 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
     ret
   }
 
+  def peek(idx: Int): Any = {
+    stack(stack.length - 1 - idx)
+  }
+
   def get(idx: Int): Any = frame.localVariable(idx)
 
   def set(idx: Int, value: Any): Unit = frame.localVariable += (idx -> value)
@@ -50,7 +54,7 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
   }
 
   override def toString = {
-    val p = s"\t[Pc] ${pc}"
+    val p = s"\t[${method.name}:Pc] ${pc}"
     val l = frame.localVariable match {
       case v if v.nonEmpty => v.toArray.sortBy(_._1)
         .map { case (idx, value) =>

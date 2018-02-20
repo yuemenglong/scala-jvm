@@ -15,7 +15,7 @@ object Vm {
     while (!isFinish) {
       println(ctx)
       val code = ctx.code()
-      println(f"[${code.lineNo}] ${code}")
+      println(f"[${code.cf.simpleName}:${code.method.name}] [${code.lineNo}] ${code}")
       ctx.inc()
       code.proc(ctx)
     }

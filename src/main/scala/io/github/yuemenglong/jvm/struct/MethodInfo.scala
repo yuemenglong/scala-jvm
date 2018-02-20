@@ -48,7 +48,7 @@ class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with A
       case null => ""
       case _ => s"\n${code}"
     }
-    s"[Method] ${fn}${c}"
+    s"<Method> ${fn}${c}"
   }
 
   def todo: String = {

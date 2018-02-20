@@ -19,7 +19,7 @@ class FieldInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with Ac
   def descriptor: String = cpv(descriptor_index).value.toString
 
   override def toString = {
-    s"[Field] ${accessFlagsValue.mkString(",")} ${descriptor} ${name}"
+    s"<Field> ${accessFlagsValue.mkString(",")} ${descriptor} ${name}"
   }
 
   def todo = {
