@@ -88,7 +88,7 @@ object Invoke {
         case mr: ConstantMethodrefInfo =>
           val cur = ctx.rt.load(mr.clazz)
           val m = Kit.findMethod(cur, mr.name, mr.descriptor)
-          val map = Kit.makeVariableTable(ctx, m.paramsType.length + 1) // TODO interface
+          val map = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
           ctx.call(m, map)
         case _ => ???
       }
@@ -103,8 +103,7 @@ object Invoke {
       val ref = cp(index).asInstanceOf[ConstantMethodrefInfo]
       val method = ctx.rt.load(ref.clazz).method(ref.name, ref.descriptor)
       if (method.accessFlags.contains("ACC_NATIVE")) {
-        val m = Vm.staticNatives(method.cf.name, method.name, method.descriptor)
-        m()
+        ctx.rt.callStatic(method.cf, method.name, method.descriptor)()
       } else {
         val map = Kit.makeVariableTable(ctx, method.paramsType.length)
         ctx.call(method, map)

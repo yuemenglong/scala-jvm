@@ -8,11 +8,6 @@ import io.github.yuemenglong.jvm.struct.MethodInfo
   */
 object Vm {
 
-  val staticNatives: Map[(String, String, String), () => Unit] = Map(
-    ("java/lang/Object", "registerNatives", "()V") -> (() => {
-
-    }),
-  )
   val rt: RuntimeCtx = new RuntimeCtx
 
   def run(ctx: ThreadCtx): Any = {

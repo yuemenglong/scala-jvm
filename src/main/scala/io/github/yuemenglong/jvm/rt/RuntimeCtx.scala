@@ -22,6 +22,11 @@ class RuntimeCtx {
   private var classMap: Map[String, RtClazz] = Map()
   private var threads: ArrayBuffer[ThreadCtx] = new ArrayBuffer[ThreadCtx]()
 
+  private val staticNatives: Map[(String, String, String), (Map[Int, Any]) => Unit] = Map(
+    ("java/lang/Object", "registerNatives", "()V") -> ((_) => {}),
+    ("java/lang/System", "registerNatives", "()V") -> ((_) => {}),
+  )
+
   def clazzpath(root: String): Unit = {
     if (root.endsWith(".jar")) {
       val jf = new JarFile(root)
@@ -107,6 +112,10 @@ class RuntimeCtx {
 
   def putStatic(cf: ClassFile, key: String, value: Any): Unit = classMap(cf.name).putStatic(key, value)
 
+  def callStatic(cf: ClassFile, name: String, descriptor: String)(vt: Map[Int, Any] = Map()) = {
+    val m = staticNatives(cf.name, name, descriptor)
+    m(vt)
+  }
 }
 
 

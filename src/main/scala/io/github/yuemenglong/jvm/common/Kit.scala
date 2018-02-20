@@ -8,17 +8,17 @@ import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
   */
 object Kit {
   def makeVariableTable(ctx: ThreadCtx, n: Int): Map[Int, Any] = {
-    var idx = 0
-    var map = Map[Int, Any]()
-    (1 to n).foreach(_ => {
-      val p = ctx.pop()
-      map += (idx -> p)
-      idx += 1
-      if (p.isInstanceOf[Double] || p.isInstanceOf[Long]) {
-        //        map += (idx -> p)
-        idx += 1
+    val map = (1 to n).map(_ => ctx.pop()).reverse.foldLeft(Map[Int, Any]()) { case (map, v) =>
+      map.keys.isEmpty match {
+        case true => map + (0 -> v)
+        case false =>
+          val max = map.keys.max
+          map(max).isInstanceOf[Double] || map(max).isInstanceOf[Long] match {
+            case true => map + (max + 2 -> v)
+            case false => map + (max + 1 -> v)
+          }
       }
-    })
+    }
     map
   }
 
