@@ -4,10 +4,20 @@ import io.github.yuemenglong.jvm.struct.MethodInfo
 
 import scala.collection.mutable.ArrayBuffer
 
+object ThreadCtx {
+  private var counter: Int = 0
+
+  def inc(): Int = {
+    counter += 1
+    counter
+  }
+}
+
 /**
   * Created by <yuemenglong@126.com> on 2018/2/14.
   */
 class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
+  val id: Int = ThreadCtx.inc()
   var frames: ArrayBuffer[Frame] = new ArrayBuffer[Frame]()
   var stack: ArrayBuffer[Any] = new ArrayBuffer[Any]()
   frames += new Frame(m)
@@ -54,7 +64,7 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
   }
 
   override def toString = {
-    val p = s"\t[${method.name}:Pc] ${pc}"
+    val p = s"\t[Pc(${id}):${method.name}] ${pc}"
     val l = frame.localVariable match {
       case v if v.nonEmpty => v.toArray.sortBy(_._1)
         .map { case (idx, value) =>
@@ -71,7 +81,4 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
   }
 }
 
-class Frame(val method: MethodInfo, map: Map[Int, Any] = Map()) {
-  var codePos: Int = 0
-  var localVariable: Map[Int, Any] = map
-}
+

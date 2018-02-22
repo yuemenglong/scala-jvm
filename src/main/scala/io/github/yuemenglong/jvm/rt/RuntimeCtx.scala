@@ -10,12 +10,13 @@ import scala.collection.mutable.ArrayBuffer
 import scala.tools.nsc.interpreter.InputStream
 import java.util.jar.JarFile
 
+import io.github.yuemenglong.jvm.nativ.Obj
+
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
 
 class RuntimeCtx {
-  private var counter: Long = 0
   private var heap: Map[Long, Obj] = Map()
   private var clazzLoaderMap: Map[String, InputStream] = Map()
   private var clazzMetaMap: Map[String, ClassFile] = Map()
@@ -24,7 +25,18 @@ class RuntimeCtx {
 
   private val staticNatives: Map[(String, String, String), (Map[Int, Any]) => Unit] = Map(
     ("java/lang/Object", "registerNatives", "()V") -> ((_) => {}),
-    ("java/lang/System", "registerNatives", "()V") -> ((_) => {}),
+    ("java/lang/System", "registerNatives", "()V") -> ((_) => {
+      //初始化in,out,err等
+      {
+        val cf = load("java/io/PrintStream")
+        val in = new Obj(cf)
+        val out = new Obj(cf)
+        val err = new Obj(cf)
+        putStatic(cf, "in", in)
+        putStatic(cf, "out", out)
+        putStatic(cf, "err", err)
+      }
+    }),
   )
 
   def clazzpath(root: String): Unit = {
@@ -58,8 +70,7 @@ class RuntimeCtx {
   }
 
   def createObject(cf: ClassFile): Obj = {
-    counter += 1
-    val obj = new Obj(cf, counter)
+    val obj = new Obj(cf)
     heap += (obj.id -> obj)
     obj
   }

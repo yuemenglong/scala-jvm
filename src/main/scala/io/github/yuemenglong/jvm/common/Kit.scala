@@ -8,7 +8,7 @@ import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
   */
 object Kit {
   def makeVariableTable(ctx: ThreadCtx, n: Int): Map[Int, Any] = {
-    val map = (1 to n).map(_ => ctx.pop()).reverse.foldLeft(Map[Int, Any]()) { case (map, v) =>
+    (1 to n).map(_ => ctx.pop()).reverse.foldLeft(Map[Int, Any]()) { case (map, v) =>
       map.keys.isEmpty match {
         case true => map + (0 -> v)
         case false =>
@@ -19,7 +19,6 @@ object Kit {
           }
       }
     }
-    map
   }
 
   def debug(s: Any*): Unit = {

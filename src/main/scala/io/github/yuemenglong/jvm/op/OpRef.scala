@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
+import io.github.yuemenglong.jvm.nativ.Obj
 import io.github.yuemenglong.jvm.rt.{ThreadCtx, Vm}
 import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantClassInfo, ConstantMethodrefInfo, MethodInfo}
 
@@ -86,10 +87,10 @@ object Invoke {
       val info = cp(index)
       info match {
         case mr: ConstantMethodrefInfo =>
-          val cur = ctx.rt.load(mr.clazz)
-          val m = Kit.findMethod(cur, mr.name, mr.descriptor)
-          val map = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
-          ctx.call(m, map)
+          val cf = ctx.rt.load(mr.clazz)
+          val m = Kit.findMethod(cf, mr.name, mr.descriptor)
+          val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
+          ctx.call(m, vt)
         case _ => ???
       }
     }
@@ -101,12 +102,12 @@ object Invoke {
 
     override def proc(ctx: ThreadCtx): Unit = {
       val ref = cp(index).asInstanceOf[ConstantMethodrefInfo]
-      val method = ctx.rt.load(ref.clazz).method(ref.name, ref.descriptor)
-      if (method.accessFlags.contains("ACC_NATIVE")) {
-        ctx.rt.callStatic(method.cf, method.name, method.descriptor)()
+      val m = ctx.rt.load(ref.clazz).method(ref.name, ref.descriptor)
+      if (m.accessFlags.contains("ACC_NATIVE")) {
+        ctx.rt.callStatic(m.cf, m.name, m.descriptor)()
       } else {
-        val map = Kit.makeVariableTable(ctx, method.paramsType.length)
-        ctx.call(method, map)
+        val vt = Kit.makeVariableTable(ctx, m.paramsType.length)
+        ctx.call(m, vt)
       }
     }
   }
@@ -117,7 +118,10 @@ object Invoke {
 
     override def proc(ctx: ThreadCtx): Unit = {
       val info = cp(index).asInstanceOf[ConstantMethodrefInfo]
-      ???
+      val cf = ctx.rt.load(info.clazz)
+      val m = Kit.findMethod(cf, info.name, info.descriptor)
+      val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
+      ctx.call(m, vt)
     }
   }
 
@@ -199,5 +203,12 @@ class OpMonitor(reader: StreamReader, val cf: ClassFile, val method: MethodInfo,
     case 0xC3 => "monitorexit"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = opCode match {
+    case 0xC2 =>
+      val obj = ctx.pop().asInstanceOf[Obj]
+      obj.monitorEnter(ctx)
+    case 0xC3 =>
+      val obj = ctx.pop().asInstanceOf[Obj]
+      obj.monitorExit(ctx)
+  }
 }
