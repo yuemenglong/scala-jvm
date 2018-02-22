@@ -59,13 +59,22 @@ class OpMultiANewArray(reader: StreamReader, val cf: ClassFile, val method: Meth
 
 class OpIfNull(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val offset: Short = reader.readShort()
+  val pos: Int = offset + lineNo
 
   override val opName = opCode match {
-    case 0xC6 => s"ifnull ${offset}"
-    case 0xC7 => s"ifnonnull ${offset}"
+    case 0xC6 => s"ifnull ${pos}"
+    case 0xC7 => s"ifnonnull ${pos}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val matche = ctx.pop() match {
+      case null => opName == "ifnull"
+      case _ => opName != "ifnull"
+    }
+    if (matche) {
+      ctx.goto(pos)
+    }
+  }
 }
 
 class OpGotoW(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {

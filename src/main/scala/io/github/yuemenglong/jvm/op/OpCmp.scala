@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{StreamReader, Types}
+import io.github.yuemenglong.jvm.nativ.Num
 import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
@@ -31,15 +32,16 @@ class OpCmp(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val
   }
 
   override def proc(ctx: ThreadCtx): Unit = {
-    val b = ctx.pop().asInstanceOf[AnyVal]
+    val b = ctx.pop()
     val a = ctx.pop()
-    val ret = if (a == b) {
-      0
-    } else if (a > b) {
-      1
-    } else {
-      -1
+    val res = opCode match {
+      case 0x94 => Num.cmp(a, b)
+      case 0x95 => Num.cmp(a, b, -1)
+      case 0x96 => Num.cmp(a, b, 1)
+      case 0x97 => Num.cmp(a, b, -1)
+      case 0x98 => Num.cmp(a, b, 1)
     }
+    ctx.push(res)
   }
 }
 

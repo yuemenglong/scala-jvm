@@ -2,7 +2,7 @@ package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.StreamReader
 import io.github.yuemenglong.jvm.rt.ThreadCtx
-import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
+import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantClassInfo, MethodInfo, ValuedCpInfo}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -81,10 +81,18 @@ class OpLdc(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val
   }
 
   override def proc(ctx: ThreadCtx): Unit = {
-    val value = cpv(index).value
-    val is8Byte = value.isInstanceOf[Long] || value.isInstanceOf[Double]
-    require(!is8Byte)
-    ctx.push(value)
+    cp(index) match {
+      case v: ValuedCpInfo =>
+        val value = v.value
+        val is8Byte = value.isInstanceOf[Long] || value.isInstanceOf[Double]
+        require(!is8Byte)
+        ctx.push(value)
+      case c: ConstantClassInfo =>
+        val cf = ctx.rt.load(c.name)
+        val clazz = ctx.rt.getClass(cf)
+        ctx.push(clazz)
+    }
+
   }
 }
 

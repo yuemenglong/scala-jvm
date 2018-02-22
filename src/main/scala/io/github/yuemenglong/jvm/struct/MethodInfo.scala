@@ -20,7 +20,10 @@ class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with A
 
   def descriptor: String = cpv(descriptor_index).value.toString
 
-  def codes: Array[Op] = code.code
+  def codes: Array[Op] = code match {
+    case _ if code != null => code.code
+    case _ => throw new RuntimeException("Unreachable")
+  }
 
   def paramsType: Array[String] = {
     val contentRe = """\((.*)\).*""".r

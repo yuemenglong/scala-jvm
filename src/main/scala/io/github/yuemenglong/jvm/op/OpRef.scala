@@ -109,7 +109,7 @@ object Invoke {
       val ref = cp(index).asInstanceOf[ConstantMethodrefInfo]
       val m = ctx.rt.load(ref.clazz).method(ref.name, ref.descriptor)
       if (m.accessFlags.contains("ACC_NATIVE")) {
-        ctx.rt.callStatic(m.cf, m.name, m.descriptor)()
+        ctx.rt.callStatic(ctx, m.cf, m.name, m.descriptor)()
       } else {
         val vt = Kit.makeVariableTable(ctx, m.paramsType.length)
         ctx.call(m, vt)
@@ -125,8 +125,14 @@ object Invoke {
       val info = cp(index).asInstanceOf[ConstantMethodrefInfo]
       val cf = ctx.rt.load(info.clazz)
       val m = Kit.findMethod(cf, info.name, info.descriptor)
-      val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
-      ctx.call(m, vt)
+      m.accessFlags.contains("ACC_NATIVE") match {
+        case false =>
+          val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
+          ctx.call(m, vt)
+        case true =>
+          val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
+          ctx.rt.callVirtual(ctx, m.cf, m.name, m.descriptor)(vt)
+      }
     }
   }
 
@@ -164,8 +170,8 @@ object New {
     override val opName = s"newarray ${ty}"
 
     override def proc(ctx: ThreadCtx): Unit = {
-      val count = ctx.pop().toString.toInt
-      val arr = ctx.rt.createArray(ty, count)
+      val size = ctx.pop().toString.toInt
+      val arr = ctx.rt.createArray(ty, size)
       ctx.push(arr)
     }
   }
@@ -175,7 +181,13 @@ object New {
 
     override val opName = s"anewarray ${cp(index)}"
 
-    override def proc(ctx: ThreadCtx): Unit = ???
+    override def proc(ctx: ThreadCtx): Unit = {
+      val info = cpc(index)
+      val size = ctx.pop().toString.toInt
+      val cf = ctx.rt.load(info.name)
+      val arr = new Arr(cf, size)
+      ctx.push(arr)
+    }
   }
 
 }

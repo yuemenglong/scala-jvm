@@ -1,6 +1,5 @@
 package io.github.yuemenglong.jvm.nativ
 
-import io.github.yuemenglong.json.JSON
 import io.github.yuemenglong.jvm.struct.ClassFile
 
 /**
@@ -15,6 +14,8 @@ class Obj(val cf: ClassFile) extends Ref {
   def get(key: String): Any = fields(key)
 
   def set(key: String, value: Any): Unit = fields += (key -> value)
+
+  def call(method: String, params: Any*): Unit = {}
 
   override def toString: String = {
     s"[${cf.simpleName}]@[${id}]"

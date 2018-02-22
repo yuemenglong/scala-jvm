@@ -16,17 +16,13 @@ import io.github.yuemenglong.jvm.nativ.{Arr, Obj, Ref}
   * Created by <yuemenglong@126.com> on 2018/2/12.
   */
 
+
 class RuntimeCtx {
   private var heap: Map[Long, Ref] = Map()
   private var clazzLoaderMap: Map[String, InputStream] = Map()
   private var clazzMetaMap: Map[String, ClassFile] = Map()
-  private var classMap: Map[String, RtClazz] = Map()
+  private var clazzMap: Map[String, RtClazz] = Map()
   private var threads: ArrayBuffer[ThreadCtx] = new ArrayBuffer[ThreadCtx]()
-
-  private val staticNatives: Map[(String, String, String), (Map[Int, Any]) => Unit] = Map(
-    ("java/lang/Object", "registerNatives", "()V") -> ((_) => {}),
-    ("java/lang/System", "registerNatives", "()V") -> ((_) => {}),
-  )
 
   def clazzpath(root: String): Unit = {
     if (root.endsWith(".jar")) {
@@ -64,8 +60,8 @@ class RuntimeCtx {
     obj
   }
 
-  def createArray(ty: Any, count: Int): Arr = {
-    val arr = new Arr(ty, count)
+  def createArray(ty: Any, size: Int): Arr = {
+    val arr = new Arr(ty, size)
     heap += (arr.id -> arr)
     arr
   }
@@ -104,8 +100,8 @@ class RuntimeCtx {
     val reader = new StreamReader(is)
     val cf = new ClassFile(reader)
     Kit.debug(s"[Load] ${cf.name}")
-    classMap += (cf.name -> new RtClazz(cf))
     clazzMetaMap += (cf.name -> cf)
+    clazzMap += (cf.name -> new RtClazz(cf))
     val clinit = cf.method("<clinit>")
     if (clinit != null) {
       Vm.run(clinit)
@@ -114,14 +110,21 @@ class RuntimeCtx {
     cf
   }
 
-  def getStatic(cf: ClassFile, key: String): Any = classMap(cf.name).getStatic(key)
+  def getStatic(cf: ClassFile, key: String): Any = clazzMap(cf.name).getStatic(key)
 
-  def putStatic(cf: ClassFile, key: String, value: Any): Unit = classMap(cf.name).putStatic(key, value)
+  def putStatic(cf: ClassFile, key: String, value: Any): Unit = clazzMap(cf.name).putStatic(key, value)
 
-  def callStatic(cf: ClassFile, name: String, descriptor: String)(vt: Map[Int, Any] = Map()) = {
-    val m = staticNatives(cf.name, name, descriptor)
-    m(vt)
+  def callStatic(ctx: ThreadCtx, cf: ClassFile, name: String, descriptor: String)(vt: Map[Int, Any] = Map()): Unit = {
+    val m = NativeCall.staticNatives(cf.name, name, descriptor)
+    m(ctx, vt)
   }
+
+  def callVirtual(ctx: ThreadCtx, cf: ClassFile, name: String, descriptor: String)(vt: Map[Int, Any]): Unit = {
+    val m = NativeCall.virtualNatives(cf.name, name, descriptor)
+    m(ctx, vt)
+  }
+
+  def getClass(cf: ClassFile): Obj = clazzMap(cf.name).clazz
 }
 
 
