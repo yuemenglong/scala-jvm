@@ -30,7 +30,17 @@ class OpCmp(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val
     case 0x98 => "dcmpg"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val b = ctx.pop().asInstanceOf[AnyVal]
+    val a = ctx.pop()
+    val ret = if (a == b) {
+      0
+    } else if (a > b) {
+      1
+    } else {
+      -1
+    }
+  }
 }
 
 class OpCmp0(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
@@ -58,7 +68,7 @@ class OpCmp0(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, va
   }
 
   override def proc(ctx: ThreadCtx): Unit = {
-    val a = ctx.pop().asInstanceOf[Int]
+    val a = ctx.pop().toString.toInt
     if (fn(a)) {
       ctx.goto(pos)
     }

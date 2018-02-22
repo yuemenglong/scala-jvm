@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
-import io.github.yuemenglong.jvm.nativ.Obj
+import io.github.yuemenglong.jvm.nativ.{Arr, Obj}
 import io.github.yuemenglong.jvm.rt.{ThreadCtx, Vm}
 import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantClassInfo, ConstantMethodrefInfo, MethodInfo}
 
@@ -42,16 +42,21 @@ class OpStatic(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, 
   override val opName = s"${prefix}${postfix} ${cp(index)}"
 
   override def proc(ctx: ThreadCtx): Unit = {
+    val info = ctx.rt.load(cpf(index).clazz).field(cpf(index).name, cpf(index).descriptor)
     s"${prefix}${postfix}" match {
       case "getstatic" =>
-        val info = ctx.rt.load(cpf(index).clazz).field(cpf(index).name, cpf(index).descriptor)
         val field = ctx.rt.getStatic(info.cf, info.name)
         ctx.push(field)
       case "putstatic" =>
-        val info = ctx.rt.load(cpf(index).clazz).field(cpf(index).name, cpf(index).descriptor)
         val field = ctx.pop()
         ctx.rt.putStatic(info.cf, info.name, field)
-      case _ => ???
+      case "getfield" =>
+        val obj = ctx.pop().asInstanceOf[Obj]
+        ctx.push(obj.get(info.name))
+      case "putfield" =>
+        val value = ctx.pop()
+        val obj = ctx.pop().asInstanceOf[Obj]
+        obj.set(info.name, value)
     }
   }
 }
@@ -143,7 +148,7 @@ object New {
   class OpNewArray(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
     val atype: Short = reader.readByte()
 
-    def ty: String = {
+    val ty: String = {
       atype match {
         case 4 => "T_BOOLEAN"
         case 5 => "T_CHAR"
@@ -158,7 +163,11 @@ object New {
 
     override val opName = s"newarray ${ty}"
 
-    override def proc(ctx: ThreadCtx): Unit = ???
+    override def proc(ctx: ThreadCtx): Unit = {
+      val count = ctx.pop().toString.toInt
+      val arr = ctx.rt.createArray(ty, count)
+      ctx.push(arr)
+    }
   }
 
   class OpANewArray(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {

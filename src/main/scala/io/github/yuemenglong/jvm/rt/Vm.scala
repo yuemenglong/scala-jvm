@@ -10,6 +10,13 @@ object Vm {
 
   val rt: RuntimeCtx = new RuntimeCtx
 
+  def init(): Unit = {
+    // 调用initializeSystemClass
+    val m = rt.load("java/lang/System").method("initializeSystemClass")
+    run(m)
+    Kit.debug("Finish Init")
+  }
+
   def run(ctx: ThreadCtx): Any = {
     def isFinish: Boolean = ctx.frames.isEmpty
 

@@ -147,7 +147,7 @@ class ConstantFieldrefInfo(reader: StreamReader, override val cf: ClassFile) ext
   val class_index: Short = reader.readShort()
   val name_and_type_index: Short = reader.readShort()
 
-  def clazz: String = cpc(class_index).name.toString
+  def clazz: String = cpc(class_index).name
 
   def name: String = cp(name_and_type_index).asInstanceOf[ConstantNameAndTypeInfo].name
 

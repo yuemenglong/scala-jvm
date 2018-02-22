@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{StreamReader, Types}
+import io.github.yuemenglong.jvm.nativ.Arr
 import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
@@ -53,5 +54,10 @@ class OpAStore(reader: StreamReader,
   val prefix = "ilfdabcs".charAt(opCode - 0x4F)
   override val opName = s"${prefix}astore"
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val value = ctx.pop()
+    val index = ctx.pop().toString.toInt
+    val arr = ctx.pop().asInstanceOf[Arr]
+    arr.array(index) = value
+  }
 }
