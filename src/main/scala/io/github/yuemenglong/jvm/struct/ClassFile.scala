@@ -33,8 +33,8 @@ class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
 
   override def toString: String = {
     Array(
-      s"${accessFlags.mkString(",")} [${name}] Extends [${sup}] Implements [${implements.mkString(",")}]",
-      s"[Interface] ${implements.mkString(",")}",
+      s"${accessFlags.mkString(",")} [${name}] Extends [${sup}] Implements [${impls.mkString(",")}]",
+      s"[Interface] ${impls.mkString(",")}",
       methods.mkString("\n"),
       fields.mkString("\n"),
       "[ATTRIBUTE]",
@@ -92,8 +92,8 @@ class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
     }
   }
 
-  def implements: Array[String] = interfaces.map(i => {
-    cpv(i).value.toString
+  def impls: Array[String] = interfaces.map(i => {
+    cpc(i).name
   })
 
   override def accessMaskMap = Map(

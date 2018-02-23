@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.struct
 
 import io.github.yuemenglong.jvm.attribute.method.{CodeAttribute, SignatureAttribute}
-import io.github.yuemenglong.jvm.common.{AccessFlagName, JvmItem, StreamReader}
+import io.github.yuemenglong.jvm.common.{AccessFlagName, JvmItem, Kit, StreamReader}
 import io.github.yuemenglong.jvm.op.Op
 
 /**
@@ -25,14 +25,7 @@ class MethodInfo(reader: StreamReader, val cf: ClassFile) extends JvmItem with A
     case _ => throw new RuntimeException("Unreachable")
   }
 
-  def paramsType: Array[String] = {
-    val contentRe = """\((.*)\).*""".r
-    val content = descriptor match {
-      case contentRe(c) => c
-    }
-    val re = """((\[?[BCDFIJSZ])|(\[?L.+?;))""".r
-    re.findAllMatchIn(content).map(_.group(0)).toArray
-  }
+  def params: Array[String] = Kit.params(descriptor)
 
   def returnType: String = {
     val re = """\(.*\)(.*)""".r

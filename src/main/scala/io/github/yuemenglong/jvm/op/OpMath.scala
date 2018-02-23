@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{StreamReader, Types}
+import io.github.yuemenglong.jvm.nativ.Num
 import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
@@ -39,49 +40,14 @@ class OpMath(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, va
   override def proc(ctx: ThreadCtx): Unit = {
     val top = ctx.pop()
     val res = op match {
-      case "add" => prefix match {
-        case 'i' => ctx.pop().asInstanceOf[Int] + top.asInstanceOf[Int]
-        case 'l' => ctx.pop().asInstanceOf[Long] + top.asInstanceOf[Long]
-        case 'f' => ctx.pop().asInstanceOf[Float] + top.asInstanceOf[Float]
-        case 'd' => ctx.pop().asInstanceOf[Double] + top.asInstanceOf[Double]
-      }
-      case "sub" => prefix match {
-        case 'i' => ctx.pop().asInstanceOf[Int] - top.asInstanceOf[Int]
-        case 'l' => ctx.pop().asInstanceOf[Long] - top.asInstanceOf[Long]
-        case 'f' => ctx.pop().asInstanceOf[Float] - top.asInstanceOf[Float]
-        case 'd' => ctx.pop().asInstanceOf[Double] - top.asInstanceOf[Double]
-      }
-      case "mul" => prefix match {
-        case 'i' => ctx.pop().asInstanceOf[Int] * top.asInstanceOf[Int]
-        case 'l' => ctx.pop().asInstanceOf[Long] * top.asInstanceOf[Long]
-        case 'f' => ctx.pop().asInstanceOf[Float] * top.asInstanceOf[Float]
-        case 'd' => ctx.pop().asInstanceOf[Double] * top.asInstanceOf[Double]
-      }
-      case "div" => prefix match {
-        case 'i' => ctx.pop().asInstanceOf[Int] / top.asInstanceOf[Int]
-        case 'l' => ctx.pop().asInstanceOf[Long] / top.asInstanceOf[Long]
-        case 'f' => ctx.pop().asInstanceOf[Float] / top.asInstanceOf[Float]
-        case 'd' => ctx.pop().asInstanceOf[Double] / top.asInstanceOf[Double]
-      }
-      case "rem" => prefix match {
-        case 'i' => ctx.pop().asInstanceOf[Int] % top.asInstanceOf[Int]
-        case 'l' => ctx.pop().asInstanceOf[Long] % top.asInstanceOf[Long]
-        case 'f' => ctx.pop().asInstanceOf[Float] % top.asInstanceOf[Float]
-        case 'd' => ctx.pop().asInstanceOf[Double] % top.asInstanceOf[Double]
-      }
-      case "neg" => prefix match {
-        case 'i' => -top.asInstanceOf[Int]
-        case 'l' => -top.asInstanceOf[Long]
-        case 'f' => -top.asInstanceOf[Float]
-        case 'd' => -top.asInstanceOf[Double]
-      }
+      case "add" => Num.add(ctx.pop(), top)
+      case "sub" => Num.sub(ctx.pop(), top)
+      case "mul" => Num.mul(ctx.pop(), top)
+      case "div" => Num.div(ctx.pop(), top)
+      case "rem" => Num.rem(ctx.pop(), top)
+      case "neg" => Num.neg(top)
     }
-    ctx.push(prefix match {
-      case 'i' => res.asInstanceOf[Int]
-      case 'l' => res.asInstanceOf[Long]
-      case 'f' => res.asInstanceOf[Float]
-      case 'd' => res.asInstanceOf[Double]
-    })
+    ctx.push(res)
   }
 }
 
@@ -103,17 +69,17 @@ class OpMath2(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, v
 
   override def proc(ctx: ThreadCtx): Unit = {
     val b = fn match {
-      case "shl" => ctx.pop().asInstanceOf[Int]
-      case "shr" => ctx.pop().asInstanceOf[Int]
-      case "ushr" => ctx.pop().asInstanceOf[Int]
+      case "shl" => ctx.pop().toString.toInt
+      case "shr" => ctx.pop().toString.toInt
+      case "ushr" => ctx.pop().toString.toInt
       case _ => prefix match {
-        case 'i' => ctx.pop().asInstanceOf[Int]
-        case 'l' => ctx.pop().asInstanceOf[Long]
+        case 'i' => ctx.pop().toString.toInt
+        case 'l' => ctx.pop().toString.toLong
       }
     }
     val a = prefix match {
-      case 'i' => ctx.pop().asInstanceOf[Int]
-      case 'l' => ctx.pop().asInstanceOf[Long]
+      case 'i' => ctx.pop().toString.toInt
+      case 'l' => ctx.pop().toString.toLong
     }
     val res = fn match {
       case "shl" => a << b

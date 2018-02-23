@@ -107,14 +107,14 @@ class RuntimeCtx {
 
   def putStatic(cf: ClassFile, key: String, value: Any): Unit = clazzMap(cf.name).putStatic(key, value)
 
-  def callStatic(ctx: ThreadCtx, cf: ClassFile, name: String, descriptor: String)(vt: Map[Int, Any] = Map()): Unit = {
+  def callStatic(ctx: ThreadCtx, cf: ClassFile, name: String, descriptor: String): Unit = {
     val m = NativeCall.staticNatives(cf.name, name, descriptor)
-    m(ctx, vt)
+    m(ctx)
   }
 
-  def callVirtual(ctx: ThreadCtx, cf: ClassFile, name: String, descriptor: String)(vt: Map[Int, Any] = Map()): Unit = {
+  def callVirtual(ctx: ThreadCtx, cf: ClassFile, name: String, descriptor: String): Unit = {
     val m = NativeCall.virtualNatives(cf.name, name, descriptor)
-    m(ctx, vt)
+    m(ctx)
   }
 
   def getClass(cf: ClassFile): Obj = clazzMap(cf.name).clazz

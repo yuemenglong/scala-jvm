@@ -28,12 +28,12 @@ class OpConvert(val reader: StreamReader,
 
   override def proc(ctx: ThreadCtx): Unit = {
     val value = prefix match {
-      case 'i' => ctx.pop().asInstanceOf[Int]
-      case 'l' => ctx.pop().asInstanceOf[Long]
-      case 'f' => ctx.pop().asInstanceOf[Float]
-      case 'd' => ctx.pop().asInstanceOf[Double]
+      case 'i' => ctx.pop().toString.toInt
+      case 'l' => ctx.pop().toString.toLong
+      case 'f' => ctx.pop().toString.toFloat
+      case 'd' => ctx.pop().toString.toDouble
     }
-    val res = postfix match {
+    val res: Any = postfix match {
       case 'i' => value.toInt
       case 'l' => value.toLong
       case 'f' => value.toFloat

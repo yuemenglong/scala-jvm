@@ -63,6 +63,15 @@ object Kit {
     }
   }
 
+  def getAncestor(cf: ClassFile): Array[ClassFile] = {
+    val sup = cf.sup match {
+      case null => Array[ClassFile]()
+      case _ => Array(Vm.rt.load(cf.sup))
+    }
+    val layer = sup ++ cf.impls.map(Vm.rt.load)
+    layer ++ layer.flatMap(getAncestor)
+  }
+
   def getDeclaredFields(clazz: Class[_]): Array[Field] = {
     val parent = clazz.getSuperclass
     if (parent != null) {
@@ -79,5 +88,14 @@ object Kit {
     } else {
       clazz.getDeclaredMethods
     }
+  }
+
+  def params(descriptor: String): Array[String] = {
+    val contentRe = """\((.*)\).*""".r
+    val content = descriptor match {
+      case contentRe(c) => c
+    }
+    val re = """((\[?[BCDFIJSZ])|(\[?L.+?;))""".r
+    re.findAllMatchIn(content).map(_.group(0)).toArray
   }
 }

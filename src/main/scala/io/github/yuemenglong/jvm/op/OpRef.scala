@@ -1,9 +1,10 @@
 package io.github.yuemenglong.jvm.op
 
+import com.sun.org.apache.bcel.internal.classfile.ConstantInterfaceMethodref
 import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
 import io.github.yuemenglong.jvm.nativ.{Arr, Obj}
-import io.github.yuemenglong.jvm.rt.ThreadCtx
-import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantClassInfo, ConstantMethodrefInfo, MethodInfo}
+import io.github.yuemenglong.jvm.rt.{ThreadCtx, Vm}
+import io.github.yuemenglong.jvm.struct._
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -86,7 +87,20 @@ object Invoke {
 
     override val opName = s"invokeinterface ${cf.constant_pool(index)}"
 
-    override def proc(ctx: ThreadCtx): Unit = ???
+    override def proc(ctx: ThreadCtx): Unit = {
+      val info = cp(index).asInstanceOf[ConstantInterfaceMethodrefInfo]
+      val params = Kit.params(info.descriptor)
+      val obj = ctx.peek(params.length).asInstanceOf[Obj]
+      val cf = obj.cf
+      val m = Kit.findMethod(cf, info.name, info.descriptor)
+      m.accessFlags.contains("ACC_NATIVE") match {
+        case false =>
+          val vt = Kit.makeVariableTable(ctx, m.params.length + 1)
+          ctx.call(m, vt)
+        case true =>
+          ctx.rt.callVirtual(ctx, m.cf, m.name, m.descriptor)
+      }
+    }
   }
 
   class OpInvokeSpecial(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
@@ -99,7 +113,7 @@ object Invoke {
         case mr: ConstantMethodrefInfo =>
           val cf = ctx.rt.load(mr.clazz)
           val m = Kit.findMethod(cf, mr.name, mr.descriptor)
-          val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
+          val vt = Kit.makeVariableTable(ctx, m.params.length + 1)
           ctx.call(m, vt)
         case _ => ???
       }
@@ -114,9 +128,9 @@ object Invoke {
       val ref = cp(index).asInstanceOf[ConstantMethodrefInfo]
       val m = ctx.rt.load(ref.clazz).method(ref.name, ref.descriptor)
       if (m.accessFlags.contains("ACC_NATIVE")) {
-        ctx.rt.callStatic(ctx, m.cf, m.name, m.descriptor)()
+        ctx.rt.callStatic(ctx, m.cf, m.name, m.descriptor)
       } else {
-        val vt = Kit.makeVariableTable(ctx, m.paramsType.length)
+        val vt = Kit.makeVariableTable(ctx, m.params.length)
         ctx.call(m, vt)
       }
     }
@@ -128,15 +142,16 @@ object Invoke {
 
     override def proc(ctx: ThreadCtx): Unit = {
       val info = cp(index).asInstanceOf[ConstantMethodrefInfo]
-      val cf = ctx.rt.load(info.clazz)
+      val params = Kit.params(info.descriptor)
+      val obj = ctx.peek(params.length).asInstanceOf[Obj]
+      val cf = obj.cf
       val m = Kit.findMethod(cf, info.name, info.descriptor)
       m.accessFlags.contains("ACC_NATIVE") match {
         case false =>
-          val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
+          val vt = Kit.makeVariableTable(ctx, m.params.length + 1)
           ctx.call(m, vt)
         case true =>
-          //          val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
-          ctx.rt.callVirtual(ctx, m.cf, m.name, m.descriptor)()
+          ctx.rt.callVirtual(ctx, m.cf, m.name, m.descriptor)
       }
     }
   }
@@ -225,16 +240,28 @@ class OpAThrow(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, 
 
 class OpCheck(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val index: Short = reader.readShort()
+  val name = opCode match {
+    case 0xC0 => "checkcast"
+    case 0xC1 => "instanceof"
+  }
   override val opName: String = {
-    val name = opCode match {
-      case 0xC0 => "checkcast"
-      case 0xC1 => "instanceof"
-    }
-    val clazzName = cp(index).asInstanceOf[ConstantClassInfo].name
+    val clazzName = cp(index)
     s"${name} ${clazzName}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    name match {
+      case "checkcast" => cp(index) match {
+        case info: ConstantClassInfo =>
+          val obj = ctx.peek(0).asInstanceOf[Obj]
+          val ancestor = Kit.getAncestor(obj.cf)
+          val find = ancestor.exists(_.name == info.name)
+          if (!find) {
+            throw new ClassCastException
+          }
+      }
+    }
+  }
 }
 
 class OpMonitor(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {

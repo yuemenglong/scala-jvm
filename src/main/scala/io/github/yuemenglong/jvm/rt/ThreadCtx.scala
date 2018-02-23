@@ -20,7 +20,7 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
   val id: Int = ThreadCtx.inc()
   var frames: ArrayBuffer[Frame] = new ArrayBuffer[Frame]()
   var stack: ArrayBuffer[Any] = new ArrayBuffer[Any]()
-  frames += new Frame(m)
+  frames += new Frame(m, stack.size)
 
   def pc: Int = method.codes(frame.codePos).lineNo
 
@@ -31,12 +31,16 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
   def push(value: Any): Unit = stack += value
 
   def pop(): Any = {
+    require(ss > 0)
     val ret = stack.last
-    stack -= ret
+    stack = stack.slice(0, stack.length - 1)
     ret
   }
 
+  def ss: Int = stack.length - frame.bp
+
   def peek(idx: Int): Any = {
+    require(ss > idx)
     stack(stack.length - 1 - idx)
   }
 
@@ -47,7 +51,7 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
   def code() = method.codes(frame.codePos)
 
   def call(method: MethodInfo, params: Map[Int, Any]): Unit = {
-    val frame = new Frame(method, params)
+    val frame = new Frame(method, stack.size, params)
     frames += frame
   }
 
@@ -72,12 +76,12 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
         }.mkString("\n")
       case _ => "\t[Local-None]"
     }
-
+    val m = s"\t[Stack-Size] ${ss}"
     val s = stack.nonEmpty match {
       case true => stack.map(v => s"\t[Stack] ${v}").mkString("\n")
       case false => "\t[Stack-None]"
     }
-    s"${p}\n${l}\n${s}"
+    s"${p}\n${l}\n${m}\n${s}"
   }
 }
 

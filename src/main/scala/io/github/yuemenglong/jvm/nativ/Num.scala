@@ -7,9 +7,31 @@ import scala.reflect.ClassTag
   */
 
 object Num {
-  def add(a: Any, b: Any): Any = {
-    require(a.getClass == b.getClass)
+  def improve(a: Any, b: Any): (Any, Any) = {
+    if (a.getClass == b.getClass) {
+      return (a, b)
+    }
     (a, b) match {
+      case (a: Float, b: Double) => (a.toDouble, b.toDouble)
+      case (a: Double, b: Float) => (a.toDouble, b.toDouble)
+      case (a: Byte, b: Short) => (a.toInt, b.toInt)
+      case (a: Byte, b: Int) => (a.toInt, b.toInt)
+      case (a: Byte, b: Long) => (a.toLong, b.toLong)
+      case (a: Short, b: Byte) => (a.toInt, b.toInt)
+      case (a: Short, b: Int) => (a.toInt, b.toInt)
+      case (a: Short, b: Long) => (a.toLong, b.toLong)
+      case (a: Int, b: Byte) => (a.toInt, b.toInt)
+      case (a: Int, b: Short) => (a.toInt, b.toInt)
+      case (a: Int, b: Long) => (a.toLong, b.toLong)
+      case (a: Long, b: Byte) => (a.toLong, b.toLong)
+      case (a: Long, b: Short) => (a.toLong, b.toLong)
+      case (a: Long, b: Int) => (a.toLong, b.toLong)
+      case _ => throw new RuntimeException("Unreachable")
+    }
+  }
+
+  def add(a: Any, b: Any): Any = {
+    improve(a, b) match {
       case (Float.NaN, _) => Float.NaN
       case (Double.NaN, _) => Double.NaN
       case (_, Float.NaN) => Float.NaN
@@ -25,8 +47,7 @@ object Num {
   }
 
   def sub(a: Any, b: Any): Any = {
-    require(a.getClass == b.getClass)
-    (a, b) match {
+    improve(a, b) match {
       case (Float.NaN, _) => Float.NaN
       case (Double.NaN, _) => Double.NaN
       case (_, Float.NaN) => Float.NaN
@@ -42,8 +63,7 @@ object Num {
   }
 
   def mul(a: Any, b: Any): Any = {
-    require(a.getClass == b.getClass)
-    (a, b) match {
+    improve(a, b) match {
       case (Float.NaN, _) => Float.NaN
       case (Double.NaN, _) => Double.NaN
       case (_, Float.NaN) => Float.NaN
@@ -59,8 +79,7 @@ object Num {
   }
 
   def div(a: Any, b: Any): Any = {
-    require(a.getClass == b.getClass)
-    (a, b) match {
+    improve(a, b) match {
       case (Float.NaN, _) => Float.NaN
       case (Double.NaN, _) => Double.NaN
       case (_, Float.NaN) => Float.NaN
@@ -75,9 +94,25 @@ object Num {
     }
   }
 
+  def rem(a: Any, b: Any): Any = {
+    improve(a, b) match {
+      case (_, 0) => Float.NaN
+      case (Float.NaN, _) => Float.NaN
+      case (Double.NaN, _) => Double.NaN
+      case (_, Float.NaN) => Float.NaN
+      case (_, Double.NaN) => Double.NaN
+      case (a: Byte, b: Byte) => a - ((a / b) * b)
+      case (a: Short, b: Short) => a - ((a / b) * b)
+      case (a: Int, b: Int) => a - ((a / b) * b)
+      case (a: Long, b: Long) => a - ((a / b) * b)
+      case (a: Float, b: Float) => a - (Math.round(a / b) * b)
+      case (a: Double, b: Double) => a - (Math.round(a / b) * b)
+      case _ => throw new RuntimeException("Unreachable")
+    }
+  }
+
   def cmp(a: Any, b: Any, nan: Int = -1): Int = {
-    require(a.getClass == b.getClass)
-    (a, b) match {
+    improve(a, b) match {
       case (Float.NaN, _) => nan
       case (Double.NaN, _) => nan
       case (_, Float.NaN) => nan
@@ -89,6 +124,19 @@ object Num {
       case (a: Float, b: Float) => if (a < b) -1 else if (a > b) 1 else 0
       case (a: Double, b: Double) => if (a < b) -1 else if (a > b) 1 else 0
       case _ => throw new RuntimeException("Unreachable")
+    }
+  }
+
+  def neg(a: Any): Any = {
+    a match {
+      case Float.NaN => a
+      case Double.NaN => a
+      case a: Byte => -a
+      case a: Short => -a
+      case a: Int => -a
+      case a: Long => -a
+      case a: Float => -a
+      case a: Double => -a
     }
   }
 
