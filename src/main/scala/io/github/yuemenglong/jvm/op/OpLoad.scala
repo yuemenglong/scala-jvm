@@ -1,6 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.StreamReader
+import io.github.yuemenglong.jvm.nativ.Arr
 import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
@@ -50,5 +51,10 @@ class OpALoad(reader: StreamReader,
     s"${prefix}aload"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val index = ctx.pop().toString.toInt
+    val arr = ctx.pop().asInstanceOf[Arr[_]]
+    val value = arr.load(index)
+    ctx.push(value)
+  }
 }

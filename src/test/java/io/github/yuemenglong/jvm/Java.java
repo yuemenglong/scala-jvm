@@ -3,25 +3,14 @@
  */
 package io.github.yuemenglong.jvm;
 
-import java.util.*;
+import scala.collection.mutable.HashTable;
+
+import java.util.Hashtable;
 
 public class Java {
 
-    private Set entrySet;
-
-    public Set entrySet() {
-        if (entrySet == null)
-            entrySet = new HashSet<>();
-        return entrySet;
-    }
-
     public static void main(String args[]) {
-        Properties p = new Properties();
-        Set<Map.Entry<Object, Object>> s = p.entrySet();
-    }
-
-    @Override
-    public String toString() {
-        return "JavaToString";
+        Hashtable<String, String> h = new Hashtable<String, String>();
+        h.remove("1");
     }
 }

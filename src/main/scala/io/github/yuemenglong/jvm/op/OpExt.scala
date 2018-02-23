@@ -67,11 +67,9 @@ class OpIfNull(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, 
   }
 
   override def proc(ctx: ThreadCtx): Unit = {
-    val matche = ctx.pop() match {
-      case null => opName == "ifnull"
-      case _ => opName != "ifnull"
-    }
-    if (matche) {
+    val v = ctx.pop()
+    val jmp = (opCode == 0xC6 && v == null) || (opCode == 0xC7 && v != null)
+    if (jmp) {
       ctx.goto(pos)
     }
   }
