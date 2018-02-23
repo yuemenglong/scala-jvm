@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{StreamReader, Types}
-import io.github.yuemenglong.jvm.nativ.Num
+import io.github.yuemenglong.jvm.nativ.{Num, Obj}
 import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
@@ -114,6 +114,7 @@ class OpCmpI(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, va
 
 class OpCmpA(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   val offset: Short = reader.readShort()
+  val pos: Int = offset + lineNo
   val fn: (AnyRef, AnyRef) => Boolean = opCode match {
     case 0xA5 => (a: AnyRef, b: AnyRef) => a == b
     case 0xA6 => (a: AnyRef, b: AnyRef) => a != b
@@ -124,8 +125,18 @@ class OpCmpA(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, va
   }
 
   override val opName = {
-    s"if_acmp${postfix} ${offset}"
+    s"if_acmp${postfix} ${pos}"
   }
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val a = ctx.pop().asInstanceOf[Obj]
+    val b = ctx.pop().asInstanceOf[Obj]
+    val jmp = opCode match {
+      case 0xA5 => a == b
+      case 0xA6 => a != b
+    }
+    if (jmp) {
+      ctx.goto(pos)
+    }
+  }
 }

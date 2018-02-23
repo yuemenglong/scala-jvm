@@ -250,14 +250,29 @@ class OpCheck(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, v
   }
 
   override def proc(ctx: ThreadCtx): Unit = {
-    name match {
-      case "checkcast" => cp(index) match {
+    opCode match {
+      case 0xC0 => cp(index) match {
         case info: ConstantClassInfo =>
           val obj = ctx.peek(0).asInstanceOf[Obj]
-          val ancestor = Kit.getAncestor(obj.cf)
-          val find = ancestor.exists(_.name == info.name)
-          if (!find) {
-            throw new ClassCastException
+          if (obj != null) {
+            val ancestor = Kit.getAncestor(obj.cf)
+            val find = ancestor.exists(_.name == info.name)
+            if (!find) {
+              throw new ClassCastException
+            }
+          }
+      }
+      case 0xC1 => cp(index) match {
+        case info: ConstantClassInfo =>
+          val obj = ctx.peek(0).asInstanceOf[Obj]
+          obj match {
+            case null => ctx.push(0)
+            case _ => val ancestor = Kit.getAncestor(obj.cf)
+              val find = ancestor.exists(_.name == info.name)
+              find match {
+                case true => ctx.push(1)
+                case false => ctx.push(0)
+              }
           }
       }
     }
