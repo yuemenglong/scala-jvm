@@ -1,5 +1,7 @@
 package io.github.yuemenglong.jvm.nativ
 
+import scala.reflect.ClassTag
+
 /**
   * Created by <yuemenglong@126.com> on 2018/2/22.
   */
@@ -87,6 +89,26 @@ object Num {
       case (a: Float, b: Float) => if (a < b) -1 else if (a > b) 1 else 0
       case (a: Double, b: Double) => if (a < b) -1 else if (a > b) 1 else 0
       case _ => throw new RuntimeException("Unreachable")
+    }
+  }
+
+  def convert(v: Any, clazz: Class[_]): Any = {
+    if (clazz == classOf[Byte]) {
+      v.toString.toByte
+    } else if (clazz == classOf[Char]) {
+      v.toString.toInt.toChar
+    } else if (clazz == classOf[Short]) {
+      v.toString.toShort
+    } else if (clazz == classOf[Int]) {
+      v.toString.toInt
+    } else if (clazz == classOf[Long]) {
+      v.toString.toLong
+    } else if (clazz == classOf[Float]) {
+      v.toString.toFloat
+    } else if (clazz == classOf[Double]) {
+      v.toString.toDouble
+    } else {
+      ???
     }
   }
 }

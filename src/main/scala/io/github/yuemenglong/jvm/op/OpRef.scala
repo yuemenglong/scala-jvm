@@ -135,8 +135,8 @@ object Invoke {
           val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
           ctx.call(m, vt)
         case true =>
-          val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
-          ctx.rt.callVirtual(ctx, m.cf, m.name, m.descriptor)(vt)
+          //          val vt = Kit.makeVariableTable(ctx, m.paramsType.length + 1)
+          ctx.rt.callVirtual(ctx, m.cf, m.name, m.descriptor)()
       }
     }
   }

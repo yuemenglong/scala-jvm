@@ -4,9 +4,7 @@
 package io.github.yuemenglong.jvm;
 
 public class Java {
-
     public static void main(String args[]) {
-        String s = "1";
-        s.length();
+//        System.out.println("hi");
     }
 }

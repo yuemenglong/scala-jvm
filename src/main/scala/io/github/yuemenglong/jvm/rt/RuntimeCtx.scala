@@ -112,7 +112,7 @@ class RuntimeCtx {
     m(ctx, vt)
   }
 
-  def callVirtual(ctx: ThreadCtx, cf: ClassFile, name: String, descriptor: String)(vt: Map[Int, Any]): Unit = {
+  def callVirtual(ctx: ThreadCtx, cf: ClassFile, name: String, descriptor: String)(vt: Map[Int, Any] = Map()): Unit = {
     val m = NativeCall.virtualNatives(cf.name, name, descriptor)
     m(ctx, vt)
   }

@@ -1,6 +1,6 @@
 package io.github.yuemenglong.jvm.rt
 
-import io.github.yuemenglong.jvm.nativ.Obj
+import io.github.yuemenglong.jvm.nativ.{Cls, Obj}
 import io.github.yuemenglong.jvm.struct.ClassFile
 
 /**
@@ -11,7 +11,7 @@ class RtClazz(val cf: ClassFile) {
     f.accessFlags.contains("ACC_STATIC")
   }).map(f => (f.name, null)).toMap
 
-  val clazz: Obj = Vm.rt.createObject(Vm.rt.load("java/lang/Class"))
+  val clazz: Obj = new Cls(cf)
 
   def putStatic(key: String, value: Any): Unit = statics += (key -> value)
 

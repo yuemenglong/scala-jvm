@@ -64,7 +64,7 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
   }
 
   override def toString = {
-    val p = s"\t[Pc(${id}):${method.name}] ${pc}"
+    val p = s"\t[${id}|Pc:${method.name}] ${pc}"
     val l = frame.localVariable match {
       case v if v.nonEmpty => v.toArray.sortBy(_._1)
         .map { case (idx, value) =>

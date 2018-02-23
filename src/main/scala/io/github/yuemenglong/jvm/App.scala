@@ -9,10 +9,7 @@ object App {
     Vm.rt.clazzpath(s"${sys.env("JAVA_HOME")}/jre/lib/rt.jar")
     //    Vm.init()
     val lib = Vm.rt.load("io/github/yuemenglong/jvm/Java")
-    //    CpInfo.debug(lib.constant_pool)
-
     Vm.run(lib.main())
-    //    println(lib)
   }
 }
 
