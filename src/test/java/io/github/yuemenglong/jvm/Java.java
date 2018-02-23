@@ -6,6 +6,7 @@ package io.github.yuemenglong.jvm;
 public class Java {
 
     public static void main(String args[]) {
-        Java.class.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append("");
     }
 }

@@ -1,11 +1,8 @@
 package io.github.yuemenglong.jvm.op
 
-import io.github.yuemenglong.jvm.common.{StreamReader, Types}
-import io.github.yuemenglong.jvm.nativ.Arr
+import io.github.yuemenglong.jvm.common.StreamReader
 import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
-
-import scala.reflect.{ClassTag, classTag}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -57,7 +54,7 @@ class OpAStore(reader: StreamReader,
   override def proc(ctx: ThreadCtx): Unit = {
     val value = ctx.pop()
     val index = ctx.pop().toString.toInt
-    val arr = ctx.pop().asInstanceOf[Arr]
+    val arr = ctx.pop().asInstanceOf[Array[Any]]
     arr.array(index) = value
   }
 }

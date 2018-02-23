@@ -54,7 +54,7 @@ class ClassFile(reader: StreamReader) extends JvmItem with AccessFlagName {
 
   def sup: String = {
     super_class match {
-      case 0 => "NULL"
+      case 0 => null
       case _ => cp(super_class).asInstanceOf[ConstantClassInfo].name
     }
   }

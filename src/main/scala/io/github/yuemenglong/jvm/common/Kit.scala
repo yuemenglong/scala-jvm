@@ -1,7 +1,9 @@
 package io.github.yuemenglong.jvm.common
 
+import java.lang.reflect.{Field, Method}
+
 import io.github.yuemenglong.jvm.rt.{ThreadCtx, Vm}
-import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
+import io.github.yuemenglong.jvm.struct.{ClassFile, FieldInfo, MethodInfo}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/19.
@@ -36,6 +38,46 @@ object Kit {
     }).find(_ != null) match {
       case Some(m) => m
       case None => null
+    }
+  }
+
+  def getCfFields(cf: ClassFile): Array[FieldInfo] = {
+    val p = cf.sup match {
+      case null => Array[FieldInfo]()
+      case _ => getCfFields(Vm.rt.load(cf.sup))
+    }
+    cf.fields ++ p
+  }
+
+  def defaultFieldValue(f: FieldInfo): Any = {
+    f.descriptor match {
+      case "B" => 0.toByte
+      case "C" => 0.toChar
+      case "D" => 0.toDouble
+      case "F" => 0.toFloat
+      case "I" => 0
+      case "J" => 0.toLong
+      case "S" => 0.toShort
+      case "Z" => false
+      case _ => null
+    }
+  }
+
+  def getDeclaredFields(clazz: Class[_]): Array[Field] = {
+    val parent = clazz.getSuperclass
+    if (parent != null) {
+      getDeclaredFields(parent) ++ clazz.getDeclaredFields
+    } else {
+      clazz.getDeclaredFields
+    }
+  }
+
+  def getDeclaredMethods(clazz: Class[_]): Array[Method] = {
+    val parent = clazz.getSuperclass
+    if (parent != null) {
+      getDeclaredMethods(parent) ++ clazz.getDeclaredMethods
+    } else {
+      clazz.getDeclaredMethods
     }
   }
 }

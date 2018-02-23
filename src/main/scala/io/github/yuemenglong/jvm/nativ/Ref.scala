@@ -52,11 +52,5 @@ trait Ref {
         s"${key}:${vs}"
       }.mkString(",")
       s"{${content}"
-    case arr: Arr =>
-      val content = arr.array.map {
-        case ref: Ref => ref.debug
-        case o => o.toString
-      }.mkString(",")
-      s"[${content}]"
   }
 }

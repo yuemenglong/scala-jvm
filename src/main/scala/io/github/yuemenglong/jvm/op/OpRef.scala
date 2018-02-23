@@ -1,8 +1,8 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
-import io.github.yuemenglong.jvm.nativ.{Arr, Obj}
-import io.github.yuemenglong.jvm.rt.{ThreadCtx, Vm}
+import io.github.yuemenglong.jvm.nativ.Obj
+import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantClassInfo, ConstantMethodrefInfo, MethodInfo}
 
 /**
@@ -51,8 +51,13 @@ class OpStatic(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, 
         val field = ctx.pop()
         ctx.rt.putStatic(info.cf, info.name, field)
       case "getfield" =>
-        val obj = ctx.pop().asInstanceOf[Obj]
-        ctx.push(obj.get(info.name))
+        ctx.pop() match {
+          case obj: Obj => ctx.push(obj.get(info.name))
+          case s: String =>
+            val f = s.getClass.getDeclaredField(info.name)
+            f.setAccessible(true)
+            ctx.push(f.get(s))
+        }
       case "putfield" =>
         val value = ctx.pop()
         val obj = ctx.pop().asInstanceOf[Obj]
@@ -171,7 +176,7 @@ object New {
 
     override def proc(ctx: ThreadCtx): Unit = {
       val size = ctx.pop().toString.toInt
-      val arr = ctx.rt.createArray(ty, size)
+      val arr = new Array[Any](size)
       ctx.push(arr)
     }
   }
@@ -184,8 +189,8 @@ object New {
     override def proc(ctx: ThreadCtx): Unit = {
       val info = cpc(index)
       val size = ctx.pop().toString.toInt
-      val cf = ctx.rt.load(info.name)
-      val arr = new Arr(cf, size)
+      val _ = ctx.rt.load(info.name)
+      val arr = new Array[Any](size)
       ctx.push(arr)
     }
   }
@@ -195,7 +200,12 @@ object New {
 class OpArrayLength(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {
   override val opName = "arraylength"
 
-  override def proc(ctx: ThreadCtx): Unit = ???
+  override def proc(ctx: ThreadCtx): Unit = {
+    val len = ctx.pop() match {
+      case arr: Array[_] => arr.length
+    }
+    ctx.push(len)
+  }
 }
 
 class OpAThrow(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val lineNo: Int, val opCode: Int) extends Op {

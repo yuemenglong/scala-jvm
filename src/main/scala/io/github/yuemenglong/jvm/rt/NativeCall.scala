@@ -9,6 +9,9 @@ object NativeCall {
   val staticNatives: Map[(String, String, String), NativeFn] = Map(
     ("java/lang/Object", "registerNatives", "()V") -> ((_, _) => {}),
     ("java/lang/System", "registerNatives", "()V") -> ((_, _) => {}),
+    ("java/lang/System", "arraycopy", "(Ljava/lang/Object;ILjava/lang/Object;II)V") -> ((_, _) => {
+
+    }),
     ("java/lang/Class", "registerNatives", "()V") -> ((_, _) => {}),
   )
   val virtualNatives: Map[(String, String, String), NativeFn] = Map(

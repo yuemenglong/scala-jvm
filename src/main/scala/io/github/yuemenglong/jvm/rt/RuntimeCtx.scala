@@ -2,15 +2,14 @@ package io.github.yuemenglong.jvm.rt
 
 import java.io.{File, FileInputStream}
 import java.nio.file.Paths
+import java.util.jar.JarFile
 
 import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
+import io.github.yuemenglong.jvm.nativ.{Obj, Ref}
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.tools.nsc.interpreter.InputStream
-import java.util.jar.JarFile
-
-import io.github.yuemenglong.jvm.nativ.{Arr, Obj, Ref}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -58,12 +57,6 @@ class RuntimeCtx {
     val obj = new Obj(cf)
     heap += (obj.id -> obj)
     obj
-  }
-
-  def createArray(ty: Any, size: Int): Arr = {
-    val arr = new Arr(ty, size)
-    heap += (arr.id -> arr)
-    arr
   }
 
   def createThread(method: MethodInfo): ThreadCtx = {
