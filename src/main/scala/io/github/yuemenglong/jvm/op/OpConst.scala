@@ -1,8 +1,9 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.StreamReader
+import io.github.yuemenglong.jvm.nativ.Str
 import io.github.yuemenglong.jvm.rt.ThreadCtx
-import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantClassInfo, MethodInfo, ValuedCpInfo}
+import io.github.yuemenglong.jvm.struct._
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/12.
@@ -82,6 +83,9 @@ class OpLdc(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val
 
   override def proc(ctx: ThreadCtx): Unit = {
     cp(index) match {
+      case s: ConstantStringInfo =>
+        val str = new Str(s.value)
+        ctx.push(str)
       case v: ValuedCpInfo =>
         val value = v.value
         val is8Byte = value.isInstanceOf[Long] || value.isInstanceOf[Double]

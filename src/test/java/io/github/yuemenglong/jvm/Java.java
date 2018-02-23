@@ -6,7 +6,7 @@ package io.github.yuemenglong.jvm;
 public class Java {
 
     public static void main(String args[]) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("");
+        String s = "1";
+        s.length();
     }
 }

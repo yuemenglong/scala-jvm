@@ -133,11 +133,11 @@ class ConstantClassInfo(reader: StreamReader, override val cf: ClassFile) extend
   override def debug: String = name
 }
 
-class ConstantStringInfo(reader: StreamReader, override val cf: ClassFile) extends ValuedCpInfo {
+class ConstantStringInfo(reader: StreamReader, override val cf: ClassFile) extends CpInfo {
   override val tag = 8
   val string_index: Short = reader.readShort()
 
-  def value: Any = cpv(string_index).value.toString
+  def value: String = cpv(string_index).value.toString
 
   override def debug: String = value.toString
 }

@@ -1,7 +1,7 @@
 package io.github.yuemenglong.jvm.op
 
 import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
-import io.github.yuemenglong.jvm.nativ.Obj
+import io.github.yuemenglong.jvm.nativ.{Arr, Obj}
 import io.github.yuemenglong.jvm.rt.ThreadCtx
 import io.github.yuemenglong.jvm.struct.{ClassFile, ConstantClassInfo, ConstantMethodrefInfo, MethodInfo}
 
@@ -176,7 +176,16 @@ object New {
 
     override def proc(ctx: ThreadCtx): Unit = {
       val size = ctx.pop().toString.toInt
-      val arr = new Array[Any](size)
+      val arr = atype match {
+        case 4 => new Arr[Boolean](size)
+        case 5 => new Arr[Char](size)
+        case 6 => new Arr[Float](size)
+        case 7 => new Arr[Double](size)
+        case 8 => new Arr[Byte](size)
+        case 9 => new Arr[Short](size)
+        case 10 => new Arr[Int](size)
+        case 11 => new Arr[Long](size)
+      }
       ctx.push(arr)
     }
   }
@@ -190,7 +199,7 @@ object New {
       val info = cpc(index)
       val size = ctx.pop().toString.toInt
       val _ = ctx.rt.load(info.name)
-      val arr = new Array[Any](size)
+      val arr = new Arr[Obj](size)
       ctx.push(arr)
     }
   }
@@ -202,7 +211,7 @@ class OpArrayLength(reader: StreamReader, val cf: ClassFile, val method: MethodI
 
   override def proc(ctx: ThreadCtx): Unit = {
     val len = ctx.pop() match {
-      case arr: Array[_] => arr.length
+      case arr: Arr[_] => arr.array.length
     }
     ctx.push(len)
   }
