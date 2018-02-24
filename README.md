@@ -43,7 +43,7 @@ java的数组比较特殊，没有.class文件与数组对应，需要在运行�
     def main(args: Array[String]): Unit = {
         Vm.rt.clazzpath(s"${sys.env("JAVA_HOME")}/jre/lib/rt.jar") // 引入java运行时包
         Vm.rt.clazzpath("target/test-classes")                     // 引入自己写的class文件
-        Vm.init()
-        val lib = Vm.rt.load("io/github/yuemenglong/jvm/Java")     // 加载main方法对应的类
+        Vm.init()                                                  // 初始化虚拟机
+        val lib = Vm.rt.load("io/github/yuemenglong/jvm/Java")     // 加载main方法对应的类
         Vm.run(lib.main())                                         // 执行main方法
     }
