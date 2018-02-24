@@ -1,5 +1,6 @@
 package io.github.yuemenglong.jvm.rt
 
+import io.github.yuemenglong.jvm.common.Kit
 import io.github.yuemenglong.jvm.nativ.{Obj, Str}
 
 /**
@@ -50,10 +51,30 @@ object NativeCall {
     ("java/io/FileInputStream", "initIDs", "()V") -> (ctx => {
 
     }),
+    ("java/io/FileOutputStream", "initIDs", "()V") -> (ctx => {
+
+    }),
     ("java/io/FileDescriptor", "initIDs", "()V") -> (ctx => {
 
     }),
+    ("sun/reflect/Reflection", "getCallerClass", "()Ljava/lang/Class;") -> (ctx => {
+      val m = ctx.frame.method
+      val clazz = ctx.rt.getClass(m.cf)
+      ctx.push(clazz)
+    }),
+    ("java/io/FileDescriptor", "set", "(I)J") -> (ctx => {
+      ctx.push(ctx.pop().asInstanceOf[Int].toLong)
+    }),
+    ("java/security/AccessController", "doPrivileged", "(Ljava/security/PrivilegedExceptionAction;)Ljava/lang/Object;") -> (ctx => {
+      val obj = ctx.pop().asInstanceOf[Obj]
+      val m = Kit.findMethod(obj.cf, "run", "()Ljava/lang/reflect/Field;")
+      val ret = Vm.run(m, Map(0 -> obj))
+      ctx.push(ret)
+    }),
   )
+
+  //------------------------------------------------------------------------------
+
   val virtualNatives: Map[(String, String, String), NativeFn] = Map(
     ("java/lang/Class", "isInterface", "()Z") -> (ctx => {
       ???
@@ -71,6 +92,18 @@ object NativeCall {
     ("java/lang/Object", "hashCode", "()I") -> (ctx => {
       val obj = ctx.pop().asInstanceOf[Obj]
       ctx.push(obj.id)
+    }),
+    ("sun/misc/Unsafe", "arrayBaseOffset", "(Ljava/lang/Class;)I") -> (ctx => {
+      ctx.pop()
+      ctx.push(0)
+    }),
+    ("sun/misc/Unsafe", "arrayIndexScale", "(Ljava/lang/Class;)I") -> (ctx => {
+      ctx.pop()
+      ctx.push(1)
+    }),
+    ("sun/misc/Unsafe", "addressSize", "()I") -> (ctx => {
+      ctx.pop()
+      ctx.push(0)
     }),
   )
 }

@@ -53,7 +53,7 @@ class OpALoad(reader: StreamReader,
 
   override def proc(ctx: ThreadCtx): Unit = {
     val index = ctx.pop().toString.toInt
-    val arr = ctx.pop().asInstanceOf[Arr[_]]
+    val arr = ctx.pop().asInstanceOf[Arr]
     val value = arr.load(index)
     ctx.push(value)
   }

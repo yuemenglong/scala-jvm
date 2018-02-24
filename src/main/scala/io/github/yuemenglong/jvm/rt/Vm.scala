@@ -1,6 +1,6 @@
 package io.github.yuemenglong.jvm.rt
 
-import io.github.yuemenglong.jvm.common.Kit
+import io.github.yuemenglong.jvm.common.{Kit, UnreachableException}
 import io.github.yuemenglong.jvm.struct.MethodInfo
 
 /**
@@ -12,6 +12,7 @@ object Vm {
 
   def init(): Unit = {
     // 调用initializeSystemClass
+    rt.load("java/lang/Class")
     val m = rt.load("java/lang/System").method("initializeSystemClass")
     run(m)
     Kit.debug("Finish Init")
@@ -28,9 +29,13 @@ object Vm {
       code.proc(ctx)
     }
     rt.finishThread(ctx)
+    ctx.stack.nonEmpty match {
+      case true => ctx.stack.last
+      case false => Unit
+    }
   }
 
-  def run(method: MethodInfo): Any = {
-    run(rt.createThread(method))
+  def run(method: MethodInfo, vt: Map[Int, Any] = Map()): Any = {
+    run(rt.createThread(method, vt))
   }
 }

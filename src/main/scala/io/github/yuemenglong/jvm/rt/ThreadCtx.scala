@@ -16,11 +16,11 @@ object ThreadCtx {
 /**
   * Created by <yuemenglong@126.com> on 2018/2/14.
   */
-class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
+class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx, vt: Map[Int, Any] = Map()) {
   val id: Int = ThreadCtx.inc()
   var frames: ArrayBuffer[Frame] = new ArrayBuffer[Frame]()
   var stack: ArrayBuffer[Any] = new ArrayBuffer[Any]()
-  frames += new Frame(m, stack.size)
+  frames += new Frame(m, stack.size, vt)
 
   def pc: Int = method.codes(frame.codePos).lineNo
 

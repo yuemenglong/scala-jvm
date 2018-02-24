@@ -34,9 +34,9 @@ object Kit {
       if (ret == null) {
         cur = Vm.rt.superClazz(cur)
       }
-      ret
-    }).find(_ != null) match {
-      case Some(m) => m
+      (cur, ret)
+    }).takeWhile(_._1 != null).find(_._2 != null) match {
+      case Some(m) => m._2
       case None => null
     }
   }

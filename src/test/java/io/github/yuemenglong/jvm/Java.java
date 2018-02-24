@@ -11,6 +11,7 @@ import java.util.Hashtable;
 public class Java {
 
     public static void main(String args[]) {
+        Java[][] a = new Java[1][];
         HashMap<String, String> m = new HashMap<>();
         m.put("1", "2");
     }

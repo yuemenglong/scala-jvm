@@ -4,7 +4,7 @@ import java.io.{File, FileInputStream}
 import java.nio.file.Paths
 import java.util.jar.JarFile
 
-import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
+import io.github.yuemenglong.jvm.common.{Kit, StreamReader, UnreachableException}
 import io.github.yuemenglong.jvm.nativ.{Obj, Ref}
 import io.github.yuemenglong.jvm.struct.{ClassFile, MethodInfo}
 
@@ -20,7 +20,7 @@ class RuntimeCtx {
   private var heap: Map[Int, Ref] = Map()
   private var clazzLoaderMap: Map[String, InputStream] = Map()
   private var clazzMetaMap: Map[String, ClassFile] = Map()
-  private var clazzMap: Map[String, RtClazz] = Map()
+  private var clazzMap: Map[String, RuntimeCls] = Map()
   private var threads: ArrayBuffer[ThreadCtx] = new ArrayBuffer[ThreadCtx]()
 
   def clazzpath(root: String): Unit = {
@@ -59,11 +59,11 @@ class RuntimeCtx {
     obj
   }
 
-  def createThread(method: MethodInfo): ThreadCtx = {
+  def createThread(method: MethodInfo, vt: Map[Int, Any] = Map()): ThreadCtx = {
     if (!clazzMetaMap.contains(method.cf.name)) {
       clazzMetaMap += (method.cf.name -> method.cf)
     }
-    threads += new ThreadCtx(method, this)
+    threads += new ThreadCtx(method, this, vt)
     Kit.debug("[CreateThread]")
     threads.last
   }
@@ -94,7 +94,7 @@ class RuntimeCtx {
     val cf = new ClassFile(reader)
     Kit.debug(s"[Load] ${cf.name}")
     clazzMetaMap += (cf.name -> cf)
-    clazzMap += (cf.name -> new RtClazz(cf))
+    clazzMap += (cf.name -> new RuntimeClsT(cf))
     val clinit = cf.method("<clinit>")
     if (clinit != null) {
       Vm.run(clinit)
@@ -117,7 +117,31 @@ class RuntimeCtx {
     m(ctx)
   }
 
-  def getClass(cf: ClassFile): Obj = clazzMap(cf.name).clazz
+  def getClass(cf: ClassFile): Obj = {
+    clazzMap(cf.name).clazz
+  }
+
+  def getClass(cf: ClassFile, dim: Int): Obj = {
+    val name = (1 to dim).map(_ => "[").mkString("") + cf.name + ";"
+    clazzMap.get(name) match {
+      case Some(r) => r.clazz
+      case None =>
+        val rtc = new RuntimeClsAT(cf, dim)
+        clazzMap += (name -> rtc)
+        rtc.clazz
+    }
+  }
+
+  def getClass(t: String, dim: Int): Obj = {
+    val name = (1 to dim).map(_ => "[").mkString("") + t
+    clazzMap.get(name) match {
+      case Some(r) => r.clazz
+      case None =>
+        val rtc = new RuntimeClsA(t, dim)
+        clazzMap += (name -> rtc)
+        rtc.clazz
+    }
+  }
 }
 
 

@@ -2,7 +2,7 @@ package io.github.yuemenglong.jvm.op
 
 import com.sun.org.apache.bcel.internal.classfile.ConstantInterfaceMethodref
 import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
-import io.github.yuemenglong.jvm.nativ.{Arr, Obj, Ref}
+import io.github.yuemenglong.jvm.nativ._
 import io.github.yuemenglong.jvm.rt.{ThreadCtx, Vm}
 import io.github.yuemenglong.jvm.struct._
 
@@ -192,14 +192,14 @@ object New {
     override def proc(ctx: ThreadCtx): Unit = {
       val size = ctx.pop().toString.toInt
       val arr = atype match {
-        case 4 => new Arr[Boolean](size)
-        case 5 => new Arr[Char](size)
-        case 6 => new Arr[Float](size)
-        case 7 => new Arr[Double](size)
-        case 8 => new Arr[Byte](size)
-        case 9 => new Arr[Short](size)
-        case 10 => new Arr[Int](size)
-        case 11 => new Arr[Long](size)
+        case 4 => new ArrI[Boolean](size)
+        case 5 => new ArrI[Char](size)
+        case 6 => new ArrI[Float](size)
+        case 7 => new ArrI[Double](size)
+        case 8 => new ArrI[Byte](size)
+        case 9 => new ArrI[Short](size)
+        case 10 => new ArrI[Int](size)
+        case 11 => new ArrI[Long](size)
       }
       ctx.push(arr)
     }
@@ -212,9 +212,10 @@ object New {
 
     override def proc(ctx: ThreadCtx): Unit = {
       val info = cpc(index)
+      val cf = ctx.rt.load(info.name)
       val size = ctx.pop().toString.toInt
       val _ = ctx.rt.load(info.name)
-      val arr = new Arr[Obj](size)
+      val arr = new ArrA(cf, size)
       ctx.push(arr)
     }
   }
@@ -226,7 +227,7 @@ class OpArrayLength(reader: StreamReader, val cf: ClassFile, val method: MethodI
 
   override def proc(ctx: ThreadCtx): Unit = {
     val len = ctx.pop() match {
-      case arr: Arr[_] => arr.array.length
+      case arr: Arr => arr.size
     }
     ctx.push(len)
   }
@@ -261,7 +262,7 @@ class OpCheck(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, v
               if (!find) {
                 throw new ClassCastException
               }
-            case arr: Arr[_] => // TODO
+            case arr: Arr => // TODO
           }
       }
       case 0xC1 => cp(index) match {

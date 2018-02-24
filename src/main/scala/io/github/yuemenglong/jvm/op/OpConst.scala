@@ -92,8 +92,22 @@ class OpLdc(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, val
         require(!is8Byte)
         ctx.push(value)
       case c: ConstantClassInfo =>
-        val cf = ctx.rt.load(c.name)
-        val clazz = ctx.rt.getClass(cf)
+        val clazz = if (c.name.startsWith("[")) {
+          val dim = c.name.count(_ == '[')
+          val t = c.name.drop(dim).toString
+          if (t.endsWith(";")) {
+            require(t.startsWith("L"))
+            val name = t.slice(1, t.length - 1)
+            val cf = ctx.rt.load(name)
+            ctx.rt.getClass(cf, dim)
+          } else {
+            require(t.length == 1)
+            ctx.rt.getClass(t, dim)
+          }
+        } else {
+          val cf = ctx.rt.load(c.name)
+          ctx.rt.getClass(cf)
+        }
         ctx.push(clazz)
     }
 
