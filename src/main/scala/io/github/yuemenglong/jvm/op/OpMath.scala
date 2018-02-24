@@ -68,26 +68,15 @@ class OpMath2(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, v
   }
 
   override def proc(ctx: ThreadCtx): Unit = {
-    val b = fn match {
-      case "shl" => ctx.pop().toString.toInt
-      case "shr" => ctx.pop().toString.toInt
-      case "ushr" => ctx.pop().toString.toInt
-      case _ => prefix match {
-        case 'i' => ctx.pop().toString.toInt
-        case 'l' => ctx.pop().toString.toLong
-      }
-    }
-    val a = prefix match {
-      case 'i' => ctx.pop().toString.toInt
-      case 'l' => ctx.pop().toString.toLong
-    }
+    val b = ctx.pop()
+    val a = ctx.pop()
     val res = fn match {
-      case "shl" => a << b
-      case "shr" => a >> b
-      case "ushr" => a >>> b
-      case "and" => a & b
-      case "or" => a | b
-      case "xor" => a ^ b
+      case "shl" => Num.shl(a, b)
+      case "shr" => Num.shr(a, b)
+      case "ushr" => Num.ushr(a, b)
+      case "and" => Num.and(a, b)
+      case "or" => Num.or(a, b)
+      case "xor" => Num.xor(a, b)
     }
     ctx.push(res)
   }

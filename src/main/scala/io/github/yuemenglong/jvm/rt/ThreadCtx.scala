@@ -44,6 +44,12 @@ class ThreadCtx(m: MethodInfo, val rt: RuntimeCtx) {
     stack(stack.length - 1 - idx)
   }
 
+  def insert(idx: Int, value: Any): Any = {
+    require(ss > idx)
+    val (a, b) = stack.splitAt(stack.length - idx - 1)
+    stack = a ++ Array(value) ++ b
+  }
+
   def get(idx: Int): Any = frame.localVariable(idx)
 
   def set(idx: Int, value: Any): Unit = frame.localVariable += (idx -> value)

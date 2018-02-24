@@ -2,7 +2,7 @@ package io.github.yuemenglong.jvm.op
 
 import com.sun.org.apache.bcel.internal.classfile.ConstantInterfaceMethodref
 import io.github.yuemenglong.jvm.common.{Kit, StreamReader}
-import io.github.yuemenglong.jvm.nativ.{Arr, Obj}
+import io.github.yuemenglong.jvm.nativ.{Arr, Obj, Ref}
 import io.github.yuemenglong.jvm.rt.{ThreadCtx, Vm}
 import io.github.yuemenglong.jvm.struct._
 
@@ -253,13 +253,15 @@ class OpCheck(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, v
     opCode match {
       case 0xC0 => cp(index) match {
         case info: ConstantClassInfo =>
-          val obj = ctx.peek(0).asInstanceOf[Obj]
-          if (obj != null) {
-            val ancestor = Kit.getAncestor(obj.cf)
-            val find = ancestor.exists(_.name == info.name)
-            if (!find) {
-              throw new ClassCastException
-            }
+          ctx.peek(0) match {
+            case null =>
+            case obj: Obj =>
+              val ancestor = Kit.getAncestor(obj.cf)
+              val find = ancestor.exists(_.name == info.name)
+              if (!find) {
+                throw new ClassCastException
+              }
+            case arr: Arr[_] => // TODO
           }
       }
       case 0xC1 => cp(index) match {

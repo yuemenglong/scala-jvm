@@ -103,8 +103,8 @@ class OpCmpI(reader: StreamReader, val cf: ClassFile, val method: MethodInfo, va
   }
 
   override def proc(ctx: ThreadCtx): Unit = {
-    val b = ctx.pop().asInstanceOf[Int]
-    val a = ctx.pop().asInstanceOf[Int]
+    val b = Num.toInt(ctx.pop())
+    val a = Num.toInt(ctx.pop())
     if (fn(a, b)) {
       ctx.goto(pos)
     }

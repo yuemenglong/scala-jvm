@@ -1,5 +1,7 @@
 package io.github.yuemenglong.jvm.nativ
 
+import io.github.yuemenglong.jvm.rt.Vm
+
 import scala.reflect.ClassTag
 
 /**

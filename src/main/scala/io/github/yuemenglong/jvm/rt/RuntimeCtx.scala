@@ -17,7 +17,7 @@ import scala.tools.nsc.interpreter.InputStream
 
 
 class RuntimeCtx {
-  private var heap: Map[Long, Ref] = Map()
+  private var heap: Map[Int, Ref] = Map()
   private var clazzLoaderMap: Map[String, InputStream] = Map()
   private var clazzMetaMap: Map[String, ClassFile] = Map()
   private var clazzMap: Map[String, RtClazz] = Map()

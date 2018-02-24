@@ -1,6 +1,6 @@
 package io.github.yuemenglong.jvm.rt
 
-import io.github.yuemenglong.jvm.nativ.{Obj, Ref, Str}
+import io.github.yuemenglong.jvm.nativ.{Obj, Str}
 
 /**
   * Created by <yuemenglong@126.com> on 2018/2/22.
@@ -13,6 +13,7 @@ object NativeCall {
     ("java/lang/System", "registerNatives", "()V") -> (_ => {}),
     ("java/lang/Class", "registerNatives", "()V") -> (_ => {}),
     ("sun/misc/VM", "initialize", "()V") -> (_ => {}),
+    ("sun/misc/Unsafe", "registerNatives", "()V") -> (_ => {}),
     ("java/lang/System", "initProperties", "(Ljava/util/Properties;)Ljava/util/Properties;") -> (_ => {}),
     ("java/lang/System", "arraycopy", "(Ljava/lang/Object;ILjava/lang/Object;II)V") -> (_ => {
       ???
@@ -46,6 +47,12 @@ object NativeCall {
       val v = ctx.pop().asInstanceOf[Long]
       ctx.push(java.lang.Double.longBitsToDouble(v))
     }),
+    ("java/io/FileInputStream", "initIDs", "()V") -> (ctx => {
+
+    }),
+    ("java/io/FileDescriptor", "initIDs", "()V") -> (ctx => {
+
+    }),
   )
   val virtualNatives: Map[(String, String, String), NativeFn] = Map(
     ("java/lang/Class", "isInterface", "()Z") -> (ctx => {
@@ -60,6 +67,10 @@ object NativeCall {
     ("java/lang/Object", "getClass", "()Ljava/lang/Class;") -> (ctx => {
       val obj = ctx.pop().asInstanceOf[Obj]
       ctx.push(Vm.rt.getClass(obj.cf))
+    }),
+    ("java/lang/Object", "hashCode", "()I") -> (ctx => {
+      val obj = ctx.pop().asInstanceOf[Obj]
+      ctx.push(obj.id)
     }),
   )
 }

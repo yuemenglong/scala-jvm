@@ -1,5 +1,7 @@
 package io.github.yuemenglong.jvm.nativ
 
+import io.github.yuemenglong.jvm.common.UnreachableException
+
 import scala.reflect.ClassTag
 
 /**
@@ -31,6 +33,15 @@ object Num {
       case (a: Long, b: Short) => (a.toLong, b.toLong)
       case (a: Long, b: Int) => (a.toLong, b.toLong)
       case _ => throw new RuntimeException("Unreachable")
+    }
+  }
+
+  def toInt(a: Any): Int = {
+    a match {
+      case a: Byte => a.toInt
+      case a: Short => a.toInt
+      case a: Int => a.toInt
+      case _ => throw new UnreachableException
     }
   }
 
@@ -141,6 +152,54 @@ object Num {
       case a: Long => -a
       case a: Float => -a
       case a: Double => -a
+    }
+  }
+
+  def shl(a: Any, b: Any): Any = {
+    (a, toInt(b)) match {
+      case (a: Int, b: Int) => a << b
+      case (a: Long, b: Int) => a << b
+      case _ => throw new UnreachableException
+    }
+  }
+
+  def shr(a: Any, b: Any): Any = {
+    (a, toInt(b)) match {
+      case (a: Int, b: Int) => a >> b
+      case (a: Long, b: Int) => a >> b
+      case _ => throw new UnreachableException
+    }
+  }
+
+  def ushr(a: Any, b: Any): Any = {
+    (a, toInt(b)) match {
+      case (a: Int, b: Int) => a >>> b
+      case (a: Long, b: Int) => a >>> b
+      case _ => throw new UnreachableException
+    }
+  }
+
+  def and(a: Any, b: Any): Any = {
+    (a, b) match {
+      case (a: Int, b: Int) => a & b
+      case (a: Long, b: Long) => a & b
+      case _ => throw new UnreachableException
+    }
+  }
+
+  def or(a: Any, b: Any): Any = {
+    (a, b) match {
+      case (a: Int, b: Int) => a | b
+      case (a: Long, b: Long) => a | b
+      case _ => throw new UnreachableException
+    }
+  }
+
+  def xor(a: Any, b: Any): Any = {
+    (a, b) match {
+      case (a: Int, b: Int) => a ^ b
+      case (a: Long, b: Long) => a ^ b
+      case _ => throw new UnreachableException
     }
   }
 

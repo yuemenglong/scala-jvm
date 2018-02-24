@@ -7,16 +7,16 @@ import io.github.yuemenglong.jvm.struct.ClassFile
   * Created by <yuemenglong@126.com> on 2018/2/22.
   */
 object Ref {
-  private var counter: Long = 0
+  private var counter: Int = 0
 
-  def inc(): Long = {
+  def inc(): Int = {
     counter += 1
     counter
   }
 }
 
 trait Ref {
-  val id: Long = Ref.inc()
+  val id: Int = Ref.inc()
   var monitor: Int = 0
   var tid: Long = 0
 
