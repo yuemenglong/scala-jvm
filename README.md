@@ -40,10 +40,10 @@ java的数组比较特殊，没有.class文件与数组对应，需要在运行�
 由于除了反射、线程等相关的外，还有大量native方法没有实现(主要因为懒)，因此依赖native方法的事儿都做不了，比如输入输出、文件读写、网络调用等(这些本质上属于库函数的范畴而不是语言的内容)。
 数值计算、面向对象等只依赖虚拟机指令的操作都能完成
 ## demo
->  def main(args: Array[String]): Unit = {
->    Vm.rt.clazzpath(s"${sys.env("JAVA_HOME")}/jre/lib/rt.jar") // 引入java运行时包
->    Vm.rt.clazzpath("target/test-classes")                     // 引入自己写的class文件
->    Vm.init()
->    val lib = Vm.rt.load("io/github/yuemenglong/jvm/Java")     // 加载main方法对应的类
->    Vm.run(lib.main())                                         // 执行main方法
->  }
+    def main(args: Array[String]): Unit = {
+        Vm.rt.clazzpath(s"${sys.env("JAVA_HOME")}/jre/lib/rt.jar") // 引入java运行时包
+        Vm.rt.clazzpath("target/test-classes")                     // 引入自己写的class文件
+        Vm.init()
+        val lib = Vm.rt.load("io/github/yuemenglong/jvm/Java")     // 加载main方法对应的类
+        Vm.run(lib.main())                                         // 执行main方法
+    }
