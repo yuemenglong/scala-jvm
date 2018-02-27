@@ -10,9 +10,13 @@ import java.util.Hashtable;
 
 public class Java {
 
+    public static double sub(double a, double b) {
+        return a - b;
+    }
+
     public static void main(String args[]) {
-        Java[][] a = new Java[1][];
-        HashMap<String, String> m = new HashMap<>();
-        m.put("1", "2");
+        int a = 1;
+        double d = 10 + a;
+        sub(d, 2);
     }
 }
