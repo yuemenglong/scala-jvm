@@ -47,3 +47,68 @@ java的数组比较特殊，没有.class文件与数组对应，需要在运行�
         val lib = Vm.rt.load("io/github/yuemenglong/jvm/Java")     // 加载main方法对应的类
         Vm.run(lib.main())                                         // 执行main方法
     }
+## output
+可以看到类似下面的输出，包括线程号，字节码指令，堆栈和局部变量表的变化等，方便学习研究
+
+        [Java:main] [0] iconst_1
+            [3|Pc:main] 1
+            [Local-None]
+            [Stack-Size] 1
+            [Stack] 1
+        [Java:main] [1] istore_1
+            [3|Pc:main] 2
+            [Local] [1] 1
+            [Stack-Size] 0
+            [Stack-None]
+        [Java:main] [2] bipush 10
+            [3|Pc:main] 4
+            [Local] [1] 1
+            [Stack-Size] 1
+            [Stack] 10
+        [Java:main] [4] iload_1
+            [3|Pc:main] 5
+            [Local] [1] 1
+            [Stack-Size] 2
+            [Stack] 10
+            [Stack] 1
+        [Java:main] [5] iadd
+            [3|Pc:main] 6
+            [Local] [1] 1
+            [Stack-Size] 1
+            [Stack] 11
+        [Java:main] [6] i2d
+            [3|Pc:main] 7
+            [Local] [1] 1
+            [Stack-Size] 1
+            [Stack] 11.0
+        [Java:main] [7] dstore_2
+            [3|Pc:main] 8
+            [Local] [1] 1
+            [Local] [2] 11.0
+            [Stack-Size] 0
+            [Stack-None]
+        [Java:main] [8] dload_2
+            [3|Pc:main] 9
+            [Local] [1] 1
+            [Local] [2] 11.0
+            [Stack-Size] 1
+            [Stack] 11.0
+        [Java:main] [9] ldc2_w [Double] 2.0
+            [3|Pc:main] 12
+            [Local] [1] 1
+            [Local] [2] 11.0
+            [Stack-Size] 2
+            [Stack] 11.0
+            [Stack] 2.0
+        [Java:main] [12] invokestatic [Methodref] io/github/yuemenglong/jvm/Java (DD)D sub
+            [3|Pc:sub] 0
+            [Local] [0] 11.0
+            [Local] [2] 2.0
+            [Stack-Size] 0
+            [Stack-None]
+        [Java:sub] [0] dload_0
+            [3|Pc:sub] 1
+            [Local] [0] 11.0
+            [Local] [2] 2.0
+            [Stack-Size] 1
+            [Stack] 11.0
